@@ -1,14 +1,13 @@
 // ==UserScript==
-// @name         灵界时辰天道液态玻璃珠 (v20.6.9 轮廓护罩版)
+// @name         灵界时辰天道液态玻璃珠
 // @namespace    http://tampermonkey.net/
 // @version      20.6.9
-// @description  极致交互大成版。新增四象天道渐变内外双层描边（锁灵护罩），强化法宝在任意复杂背景下的微雕轮廓感。
 // @author       修仙道友
 // @match        https://ling.muge.info/game.html
 // @match        http://ling.muge.info/game.html
-// @icon         https://ling.muge.info/favicon.svg
-// @grant        none
-// @run-at       document-end
+// -- 关键两行：强行锁定天道更新因果线 --
+// @updateURL    https://raw.githubusercontent.com/xiaolanglu/Spiritual-script/raw/refs/heads/main/ling-time-dot.user.js
+// @downloadURL  https://raw.githubusercontent.com/xiaolanglu/Spiritual-script/raw/refs/heads/main/ling-time-dot.user.js
 // ==/UserScript==
 
 (function() {
