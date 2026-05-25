@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         灵界时辰天道罗盘
 // @namespace    http://tampermonkey.net/
-// @version      20.7.4
-// @description  拟物交互视觉终极圆满版。实装方向四“纳芥折叠”，针对手机端特制“虚体扩容法”隐形盾牌，盲戳秒唤醒，清爽不误触。
+// @version      20.7.5
+// @description  拟物交互视觉终极至尊大成版。三方案齐聚：引入45°真玉掠影高光、三维悬浮升腾投影、级联斜面灵气吞吐呼吸，法宝自此兼具材质、空间与生命力。
 // @author       修仙道友
 // @match        https://ling.muge.info/game.html
 // @match        http://ling.muge.info/game.html
@@ -31,22 +31,23 @@
     fontStyleNode.textContent = AMBIENT_FONT;
     document.head.appendChild(fontStyleNode);
 
-    // ================= 1. 殿堂级天道美化 CSS (融入虚体折叠法则) =================
+    // ================= 1. 殿堂级天道美化 CSS (三方案大融合) =================
     const STYLES = `
         :root {
-            /* 交互联动变量 */
+            /* 方案二核心：可变3D投影变量群 */
             --ling-light-x: 45%;
             --ling-light-y: 45%;
             --ling-shadow-x: 0px;
-            --ling-shadow-y: 10px;
-            --ling-shadow-blur: 30px;
+            --ling-shadow-y: 8px;
+            --ling-shadow-blur: 24px;
+            --ling-shadow-opacity: 0.45;
             
             /* 天道界域变量 */
             --ling-inset-border-color: rgba(255, 255, 255, 0.4);
             --ling-jade-bg-color: #f4f3f0;
             --ling-jade-glint: rgba(255, 255, 255, 0.7);
             
-            /* 【20.7.4 独创】折叠偏移量与隐形触控盾牌尺寸 */
+            /* 折叠偏移量与隐形触控盾牌尺寸 */
             --ling-fold-transform: translateX(0);
             --ling-shield-width: 0px;
             --ling-shield-left: auto;
@@ -62,8 +63,9 @@
             backdrop-filter: blur(10px) saturate(180%);
             -webkit-backdrop-filter: blur(10px) saturate(180%);
             
+            /* 方案二：全动态阴影铸造（随常态/折叠/悬浮动态演变） */
             box-shadow: 
-                var(--ling-shadow-x) var(--ling-shadow-y) var(--ling-shadow-blur) rgba(0, 0, 0, 0.5),
+                var(--ling-shadow-x) var(--ling-shadow-y) var(--ling-shadow-blur) rgba(0, 0, 0, var(--ling-shadow-opacity)),
                 inset -2px -2px 6px rgba(0, 0, 0, 0.4),
                 inset 0px 0px 0px 1px rgba(255, 255, 255, 0.2),
                 inset 0px 0px 4px 3px rgba(0, 0, 0, 0.35),               
@@ -71,28 +73,25 @@
 
             border: 1px dashed rgba(255, 255, 255, 0.1); 
             
-            /* 【20.7.4 核心：结合位移与半隐的复合过渡动画】 */
             transform: var(--ling-fold-transform) scale(1);
-            transition: box-shadow 0.3s cubic-bezier(0.25, 1, 0.5, 1),
+            
+            /* 方案三：赋予大圆斜面灵气吞吐的呼吸效果 */
+            animation: lingSlopeBreath 4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+            
+            transition: box-shadow 0.35s cubic-bezier(0.25, 1, 0.5, 1),
                         opacity 0.6s cubic-bezier(0.25, 1, 0.5, 1),
                         transform 0.5s cubic-bezier(0.25, 1, 0.36, 1);
         }
 
-        /* 【20.7.4 核心：虚体扩容法——隐形神识感应盾牌】 */
+        /* 虚体扩容法——隐形神识感应盾牌 */
         #ling-time-dot::after {
-            content: '';
-            position: absolute;
-            top: -5px; bottom: -5px;
+            content: ''; position: absolute; top: -5px; bottom: -5px;
             width: var(--ling-shield-width);
-            left: var(--ling-shield-left);
-            right: var(--ling-shield-right);
-            background: transparent; /* 绝对虚体透明，防穿帮 */
-            z-index: -1;
-            pointer-events: auto; /* 必须允许点击交互 */
-            cursor: pointer;
+            left: var(--ling-shield-left); right: var(--ling-shield-right);
+            background: transparent; z-index: -1; pointer-events: auto; cursor: pointer;
         }
 
-        /* 2. 小圆·灵玉核心层 */
+        /* 2. 小圆·灵玉核心层 (方案一：加入表面流光掠影) */
         #ling-jade-core {
             position: absolute;
             top: 6px; left: 6px; right: 6px; bottom: 6px;
@@ -108,6 +107,23 @@
                 inset -1.5px -1.5px 3px rgba(0, 0, 0, 0.3),   
                 inset 0 0 0 1px var(--ling-inset-border-color); 
             transition: background-color 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* 【方案一独创：玉面上空的45°掠影高光层】 */
+        #ling-jade-core::after {
+            content: ''; position: absolute; top: 0; left: 0; width: 200%; height: 100%;
+            z-index: 6; pointer-events: none;
+            background: linear-gradient(
+                90deg, 
+                transparent 0%, 
+                rgba(255, 255, 255, 0) 30%, 
+                rgba(255, 255, 255, 0.28) 45%, 
+                rgba(255, 255, 255, 0.55) 50%, 
+                rgba(255, 255, 255, 0.28) 55%, 
+                transparent 70%
+            );
+            transform: skewX(-45deg);
+            animation: lingJadeGlint 6s cubic-bezier(0.25, 1, 0.5, 1) infinite;
         }
 
         /* 大圆与小圆之间的夹层·日常静谧虚线星轨 */
@@ -147,8 +163,15 @@
         .text-sunset-style { color: #ffe4e6; text-shadow: -0.5px -0.5px 1px rgba(0,0,0,0.9), 0.5px 0.5px 0.5px rgba(255,78,80,0.4); }
         .text-sky-style    { color: #ecfeff; text-shadow: -0.5px -0.5px 1px rgba(0,0,0,0.9), 0.5px 0.5px 0.5px rgba(6,182,212,0.4); }
 
-        /* 悬浮激活态（唤醒时重置形变并高亮） */
-        #ling-time-dot:hover { transform: translateX(0) scale(1.12) !important; opacity: 1 !important; }
+        /* 悬浮激活态（【方案二】强行拉大投影纵深，造成升腾起飞错觉） */
+        #ling-time-dot:hover { 
+            transform: translateX(0) scale(1.12) !important; 
+            opacity: 1 !important;
+            /* 投影向下大幅拉长，模糊度增加，模拟腾空 */
+            --ling-shadow-y: 16px !important;
+            --ling-shadow-blur: 36px !important;
+            --ling-shadow-opacity: 0.65 !important;
+        }
         #ling-time-dot:hover::before { border: 1px dashed rgba(197, 160, 89, 0.6); transform: rotate(180deg); }
         
         #ling-time-dot.state-day:hover    { --ling-inset-border-color: rgba(0, 0, 0, 0.7); }
@@ -161,9 +184,13 @@
         #ling-time-dot.state-sunset:hover #ling-time-text { color: #2b0000 !important; font-weight: 900 !important; -webkit-text-stroke: 0.5px #ff4e50; text-shadow: 0 0 6px rgba(249, 115, 22, 0.9); }
         #ling-time-dot.state-sky:hover #ling-time-text { color: #000c1f !important; font-weight: 900 !important; -webkit-text-stroke: 0.5px #06b6d4; text-shadow: 0 0 6px rgba(34, 211, 238, 0.9); }
 
-        #ling-time-dot:active { transform: translateX(0) scale(0.95) !important; }
+        #ling-time-dot:active { 
+            transform: translateX(0) scale(0.95) !important; 
+            --ling-shadow-y: 2px !important;
+            --ling-shadow-blur: 6px !important;
+        }
 
-        /* 星轨自转动画控制 */
+        /* 星轨自转动画 */
         .run-rotate-day::before { animation: starRotateClockwise 25s linear infinite; }
         .run-rotate-night::before { animation: starRotateClockwise 30s linear infinite; }
 
@@ -173,6 +200,19 @@
             0% { transform: translateX(0) scale(1); }
             30% { transform: translateX(0) scale(1.15); box-shadow: 0 0 35px rgba(255,255,255,0.5); }
             100% { transform: translateX(0) scale(1); }
+        }
+
+        /* 【方案一动画：真玉表面高光不间断拂过】 */
+        @keyframes lingJadeGlint {
+            0% { left: -150%; }
+            30% { left: 150%; }
+            100% { left: 150%; } /* 留出留白时间，防止高光闪烁过频 */
+        }
+
+        /* 【方案三动画：界域斜面灵气缓慢律动吞吐】 */
+        @keyframes lingSlopeBreath {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.2) contrast(1.1); }
         }
 
         @keyframes starRotateClockwise { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -219,7 +259,7 @@
 
     // ================= 3. 神识随行：鼠标坐标联动算法 =================
     document.addEventListener('mousemove', (e) => {
-        if (isDragging || isFolded) return; // 如果折叠了或者正在拖拽，暂不响应神识避光
+        if (isDragging || isFolded) return; 
         
         const rect = dot.getBoundingClientRect();
         const dotCenterX = rect.left + rect.width / 2;
@@ -233,9 +273,11 @@
             const influence = (250 - distance) / 250; 
             const lightX = 45 - (deltaX / distance) * 16 * influence;
             const lightY = 45 - (deltaY / distance) * 16 * influence;
-            const shadowX = (deltaX / distance) * 16 * influence;
-            const shadowY = 10 + (deltaY / distance) * 16 * influence;
-            const shadowBlur = 30 + influence * 15;
+            
+            // 方案二增强：神识越近，投影越产生自然的偏角偏折
+            const shadowX = (deltaX / distance) * 12 * influence;
+            const shadowY = 8 + (deltaY / distance) * 12 * influence;
+            const shadowBlur = 24 + influence * 12;
 
             dot.style.setProperty('--ling-light-x', `${lightX}%`);
             dot.style.setProperty('--ling-light-y', `${lightY}%`);
@@ -251,47 +293,45 @@
         dot.style.setProperty('--ling-light-x', '45%');
         dot.style.setProperty('--ling-light-y', '45%');
         dot.style.setProperty('--ling-shadow-x', '0px');
-        dot.style.setProperty('--ling-shadow-y', '10px');
-        dot.style.setProperty('--ling-shadow-blur', '30px');
+        dot.style.setProperty('--ling-shadow-y', '8px');
+        dot.style.setProperty('--ling-shadow-blur', '24px');
+        dot.style.setProperty('--ling-shadow-opacity', '0.45');
     }
 
-    // ================= 4. 【20.7.4 重塑】纳芥半隐与智能双向折叠算法 =================
+    // ================= 4. 纳芥半隐与智能双向折叠算法 =================
     let fadeTimer = null;
-    let isFolded = false; // 天道锁定：是否正处于纳芥折叠状态
+    let isFolded = false; 
 
     function executeFold() {
         if (isDragging || isFolded) return;
         
         const rect = dot.getBoundingClientRect();
         const winWidth = window.innerWidth;
-        const dotWidth = rect.width;
         
-        // 判定罗盘离左侧近还是右侧近
-        const isNearLeft = rect.left < (winWidth - rect.right);
         const isExactlyOnLeft = rect.left <= 0;
         const isExactlyOnRight = rect.right >= winWidth;
         
-        // 只有当罗盘贴紧了边缘，或者距离边缘极近时，才激活“缩入界外”的纳芥深度折叠
         if (isExactlyOnLeft || isExactlyOnRight || rect.left < 40 || (winWidth - rect.right) < 40) {
             isFolded = true;
-            dot.style.opacity = '0.35'; // 折叠变暗，保持静谧
-            resetLightVariables();
+            dot.style.opacity = '0.35'; 
+            
+            // 【方案二折叠细节】：折叠归位时，投影几乎抹平，达成融入边缘沉淀感
+            dot.style.setProperty('--ling-shadow-y', '2px');
+            dot.style.setProperty('--ling-shadow-blur', '4px');
+            dot.style.setProperty('--ling-shadow-opacity', '0.2');
 
             if (isExactlyOnLeft || rect.left < winWidth / 2) {
-                // 吸附在左边缘：向左移出 68%，并且隐形触控盾牌挂在右侧（屏幕内侧）
                 dot.style.setProperty('--ling-fold-transform', 'translateX(-68%)');
                 dot.style.setProperty('--ling-shield-width', '24px');
                 dot.style.setProperty('--ling-shield-left', '100%');
                 dot.style.setProperty('--ling-shield-right', 'auto');
             } else {
-                // 吸附在右边缘：向右移出 68%，隐形触控盾牌挂在左侧（屏幕内侧）
                 dot.style.setProperty('--ling-fold-transform', 'translateX(68%)');
                 dot.style.setProperty('--ling-shield-width', '24px');
                 dot.style.setProperty('--ling-shield-left', 'auto');
                 dot.style.setProperty('--ling-shield-right', '100%');
             }
         } else {
-            // 如果罗盘被道友拖在了屏幕中间，则只执行常态变暗，不执行位移隐藏，防止突兀
             dot.style.opacity = '0.35';
         }
     }
@@ -300,10 +340,9 @@
         if (!isFolded && dot.style.opacity === '1') return;
         isFolded = false;
         dot.style.opacity = '1';
-        // 撤销一切形变位移，法宝重新出鞘
         dot.style.setProperty('--ling-fold-transform', 'translateX(0)');
-        // 撤销隐形盾牌，防止挂在屏幕上误触其他游戏区域
         dot.style.setProperty('--ling-shield-width', '0px');
+        resetLightVariables();
         resetFadeTimer();
     }
 
@@ -314,15 +353,12 @@
             return;
         }
         dot.style.opacity = '1'; 
-        fadeTimer = setTimeout(executeFold, 3000); // 3秒无交互，天道归位折叠
+        fadeTimer = setTimeout(executeFold, 3000); 
     }
     
-    // 鼠标与触控唤醒大阵
     dot.addEventListener('mouseenter', resetFadeTimer);
     dot.addEventListener('mousemove', resetFadeTimer);
-    dot.addEventListener('touchstart', (e) => {
-        executeWakeUp();
-    }, { passive: true });
+    dot.addEventListener('touchstart', (e) => { executeWakeUp(); }, { passive: true });
 
     // ================= 5. 核心时辰监听逻辑 =================
     let lastKey = ""; 
@@ -394,7 +430,7 @@
 
         let finalLeft = currentLeft;
         let finalTop = currentTop;
-        const snapThreshold = 120; // 智能磁吸半径
+        const snapThreshold = 120; 
 
         const minDist = Math.min(distLeft, distRight, distTop, distBottom);
 
@@ -414,7 +450,6 @@
 
         localStorage.setItem('ling_time_dot_position', JSON.stringify({ left: finalLeft, top: finalTop }));
         
-        // 吸附完毕后，重新开始计算 3秒半隐折叠
         isFolded = false; 
         resetFadeTimer(); 
     }
