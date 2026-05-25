@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         灵界时辰天道罗盘
 // @namespace    http://tampermonkey.net/
-// @version      20.7.5
-// @description  拟物交互视觉终极至尊大成版。三方案齐聚：引入45°真玉掠影高光、三维悬浮升腾投影、级联斜面灵气吞吐呼吸，法宝自此兼具材质、空间与生命力。
+// @version      20.7.6
+// @description  拟物交互视觉终极圆满版。深度炼入凡间“炫彩流光”杀招神髓：全面升级300%超大渐变流转图层，实装双层严格同步动画，悬浮轰然激发高斯模糊雾化护体霓虹！
 // @author       修仙道友
 // @match        https://ling.muge.info/game.html
 // @match        http://ling.muge.info/game.html
@@ -31,21 +31,22 @@
     fontStyleNode.textContent = AMBIENT_FONT;
     document.head.appendChild(fontStyleNode);
 
-    // ================= 1. 殿堂级天道美化 CSS (三方案大融合) =================
+    // ================= 1. 殿堂级天道美化 CSS (连绵星河与雾化霓虹大阵) =================
     const STYLES = `
         :root {
-            /* 方案二核心：可变3D投影变量群 */
+            /* 交互联动变量群 */
             --ling-light-x: 45%;
             --ling-light-y: 45%;
             --ling-shadow-x: 0px;
-            --ling-shadow-y: 8px;
-            --ling-shadow-blur: 24px;
-            --ling-shadow-opacity: 0.45;
+            --ling-shadow-y: 6px;
+            --ling-shadow-blur: 20px;
+            --ling-shadow-opacity: 0.35;
             
-            /* 天道界域变量 */
-            --ling-inset-border-color: rgba(255, 255, 255, 0.4);
+            /* 天道界域渐变底层 - 默认白昼 */
+            --ling-inset-border-color: rgba(44, 53, 62, 0.2);
             --ling-jade-bg-color: #f4f3f0;
             --ling-jade-glint: rgba(255, 255, 255, 0.7);
+            --ling-stream-bg: linear-gradient(90deg, #f5f4f0, #e2e8f0, #fcfbf7, #f5f4f0);
             
             /* 折叠偏移量与隐形触控盾牌尺寸 */
             --ling-fold-transform: translateX(0);
@@ -54,16 +55,20 @@
             --ling-shield-right: auto;
         }
 
-        /* 1. 法宝主体 —— 罗盘仙金外壳大圆 */
+        /* 1. 法宝主体 —— 罗盘仙金外壳大圆 (融入300%超大连绵渐变) */
         #ling-time-dot {
             position: fixed;
             top: 85px; right: 20px; z-index: 10000;
             width: 44px; height: 44px; border-radius: 50%;
             cursor: move; user-select: none; box-sizing: border-box;
-            backdrop-filter: blur(10px) saturate(180%);
-            -webkit-backdrop-filter: blur(10px) saturate(180%);
+            backdrop-filter: blur(8px) saturate(160%);
+            -webkit-backdrop-filter: blur(8px) saturate(160%);
             
-            /* 方案二：全动态阴影铸造（随常态/折叠/悬浮动态演变） */
+            /* 承载天道连绵渐变流转底层 */
+            background: var(--ling-stream-bg);
+            background-size: 300% 100%;
+            
+            /* 拟物骨骼内阴影组合 */
             box-shadow: 
                 var(--ling-shadow-x) var(--ling-shadow-y) var(--ling-shadow-blur) rgba(0, 0, 0, var(--ling-shadow-opacity)),
                 inset -2px -2px 6px rgba(0, 0, 0, 0.4),
@@ -71,16 +76,32 @@
                 inset 0px 0px 4px 3px rgba(0, 0, 0, 0.35),               
                 inset 0px 0px 2px 3px var(--ling-inset-border-color);   
 
-            border: 1px dashed rgba(255, 255, 255, 0.1); 
-            
+            border: 1px dashed rgba(255, 255, 255, 0.08); 
             transform: var(--ling-fold-transform) scale(1);
             
-            /* 方案三：赋予大圆斜面灵气吞吐的呼吸效果 */
-            animation: lingSlopeBreath 4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+            /* 绝学核心：双层同步动画之——主体连绵流转 */
+            animation: lingStreamMove 16s linear infinite;
             
             transition: box-shadow 0.35s cubic-bezier(0.25, 1, 0.5, 1),
                         opacity 0.6s cubic-bezier(0.25, 1, 0.5, 1),
                         transform 0.5s cubic-bezier(0.25, 1, 0.36, 1);
+        }
+
+        /* 【化用精髓：双层同步动画之——::before 雾化护体霓虹】 */
+        #ling-time-dot::before {
+            content: ''; position: absolute; 
+            top: -5px; left: -5px; right: -5px; bottom: -5px; /* 略微放大一圈外溢 */
+            border-radius: 50%;
+            background: var(--ling-stream-bg);
+            background-size: 300% 100%;
+            opacity: 0;
+            filter: blur(12px); /* 凡间杀招的高斯模糊滤镜 */
+            z-index: -2;
+            pointer-events: none;
+            
+            /* 与主体保持绝对严丝合缝的步调，产生霓虹共振 */
+            animation: lingStreamMove 16s linear infinite;
+            transition: opacity 0.45s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
         /* 虚体扩容法——隐形神识感应盾牌 */
@@ -91,16 +112,16 @@
             background: transparent; z-index: -1; pointer-events: auto; cursor: pointer;
         }
 
-        /* 2. 小圆·灵玉核心层 (方案一：加入表面流光掠影) */
+        /* 2. 小圆·灵玉核心层 (表面流光掠影) */
         #ling-jade-core {
             position: absolute;
             top: 6px; left: 6px; right: 6px; bottom: 6px;
             border-radius: 50%; z-index: 5; box-sizing: border-box; overflow: hidden;
             background-color: var(--ling-jade-bg-color);
             background-image: 
-                linear-gradient(45deg, rgba(255,255,255,0.08) 25%, transparent 25%), 
-                linear-gradient(-45deg, rgba(255,255,255,0.08) 25%, transparent 25%),
-                linear-gradient(135deg, rgba(0,0,0,0.03) 25%, transparent 25%);
+                linear-gradient(45deg, rgba(255,255,255,0.06) 25%, transparent 25%), 
+                linear-gradient(-45deg, rgba(255,255,255,0.06) 25%, transparent 25%),
+                linear-gradient(135deg, rgba(0,0,0,0.02) 25%, transparent 25%);
             background-size: 6px 6px; 
             box-shadow: 
                 inset 1.5px 1.5px 3px var(--ling-jade-glint), 
@@ -109,35 +130,40 @@
             transition: background-color 1.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* 【方案一独创：玉面上空的45°掠影高光层】 */
+        /* 玉面上空的45°掠影高光层 */
         #ling-jade-core::after {
             content: ''; position: absolute; top: 0; left: 0; width: 200%; height: 100%;
             z-index: 6; pointer-events: none;
             background: linear-gradient(
                 90deg, 
                 transparent 0%, 
-                rgba(255, 255, 255, 0) 30%, 
-                rgba(255, 255, 255, 0.28) 45%, 
-                rgba(255, 255, 255, 0.55) 50%, 
-                rgba(255, 255, 255, 0.28) 55%, 
-                transparent 70%
+                rgba(255, 255, 255, 0) 35%, 
+                rgba(255, 255, 255, 0.25) 45%, 
+                rgba(255, 255, 255, 0.5) 50%, 
+                rgba(255, 255, 255, 0.25) 55%, 
+                transparent 65%
             );
             transform: skewX(-45deg);
-            animation: lingJadeGlint 6s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+            animation: lingJadeGlint 7s cubic-bezier(0.25, 1, 0.5, 1) infinite;
         }
 
-        /* 大圆与小圆之间的夹层·日常静谧虚线星轨 */
-        #ling-time-dot::before {
-            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            border-radius: 50%; z-index: 1; border: 1px dashed rgba(255, 255, 255, 0.15);
-            pointer-events: none; transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-        }
-
-        /* 常态天道描边与玉质色彩法则 */
-        #ling-time-dot.state-day    { --ling-inset-border-color: rgba(44, 53, 62, 0.2);   --ling-jade-bg-color: #f5f4f0; --ling-jade-glint: rgba(255, 255, 255, 0.8); }   
-        #ling-time-dot.state-night  { --ling-inset-border-color: rgba(197, 160, 89, 0.25); --ling-jade-bg-color: #14161a; --ling-jade-glint: rgba(255, 255, 255, 0.15); } 
-        #ling-time-dot.state-sunset { --ling-inset-border-color: rgba(255, 78, 80, 0.35);  --ling-jade-bg-color: #2b1212; --ling-jade-glint: rgba(255, 120, 120, 0.3); }  
-        #ling-time-dot.state-sky    { --ling-inset-border-color: rgba(6, 182, 212, 0.35);  --ling-jade-bg-color: #0f1826; --ling-jade-glint: rgba(100, 220, 255, 0.4); }  
+        /* 各个时辰精密的“300%纵深星河渐变色带”配置 */
+        #ling-time-dot.state-day    { 
+            --ling-inset-border-color: rgba(44, 53, 62, 0.2); --ling-jade-bg-color: #f5f4f0; --ling-jade-glint: rgba(255, 255, 255, 0.8); 
+            --ling-stream-bg: linear-gradient(90deg, #eae8e3, #fcfbf9, #cbd5e1, #eae8e3);
+        }   
+        #ling-time-dot.state-night  { 
+            --ling-inset-border-color: rgba(197, 160, 89, 0.25); --ling-jade-bg-color: #14161a; --ling-jade-glint: rgba(255, 255, 255, 0.15); 
+            --ling-stream-bg: linear-gradient(90deg, #14161a, #231b3c, #524227, #14161a); /* 黑夜：暗金、幽紫、黑夜星河 */
+        } 
+        #ling-time-dot.state-sunset { 
+            --ling-inset-border-color: rgba(255, 78, 80, 0.35);  --ling-jade-bg-color: #2b1212; --ling-jade-glint: rgba(255, 120, 120, 0.3); 
+            --ling-stream-bg: linear-gradient(90deg, #2b1212, #ff4e50, #f97316, #2b1212); /* 夕照：血珀晚霞流光 */
+        }  
+        #ling-time-dot.state-sky    { 
+            --ling-inset-border-color: rgba(6, 182, 212, 0.35);  --ling-jade-bg-color: #0f1826; --ling-jade-glint: rgba(100, 220, 255, 0.4); 
+            --ling-stream-bg: linear-gradient(90deg, #0f1826, #06b6d4, #1d4ed8, #0f1826); /* 破晓：清冷碧翠寒天 */
+        }  
 
         /* 小圆内部·四象神识动态玉莹图层 */
         .ling-aura-layer {
@@ -145,13 +171,13 @@
             background-image: radial-gradient(circle at var(--ling-light-x) var(--ling-light-y), var(--aura-color) 0%, transparent 75%);
             mix-blend-mode: screen; transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1); 
         }
-        .aura-day    { --aura-color: rgba(147, 197, 253, 0.65); }
-        .aura-night  { --aura-color: rgba(167, 139, 250, 0.55); }
-        .aura-sunset { --aura-color: rgba(249, 115, 22, 0.7); }
-        .aura-sky    { --aura-color: rgba(34, 211, 238, 0.7); }
+        .aura-day    { --aura-color: rgba(147, 197, 253, 0.6); }
+        .aura-night  { --aura-color: rgba(167, 139, 250, 0.5); }
+        .aura-sunset { --aura-color: rgba(249, 115, 22, 0.65); }
+        .aura-sky    { --aura-color: rgba(34, 211, 238, 0.65); }
         .ling-aura-layer.active { opacity: 1; }
 
-        /* 古法真言层（压铸雕刻内陷） */
+        /* 古法真言层 */
         #ling-time-text {
             position: relative; z-index: 10; font-family: "ShuowenZuan", "LiSu", "KaiTi", serif; 
             font-size: 13px; font-weight: 700; text-align: center; line-height: 32px; width: 100%; height: 100%; 
@@ -163,21 +189,24 @@
         .text-sunset-style { color: #ffe4e6; text-shadow: -0.5px -0.5px 1px rgba(0,0,0,0.9), 0.5px 0.5px 0.5px rgba(255,78,80,0.4); }
         .text-sky-style    { color: #ecfeff; text-shadow: -0.5px -0.5px 1px rgba(0,0,0,0.9), 0.5px 0.5px 0.5px rgba(6,182,212,0.4); }
 
-        /* 悬浮激活态（【方案二】强行拉大投影纵深，造成升腾起飞错觉） */
+        /* 悬浮激活态（高斯模糊霓虹显现，外部阴影大幅拉长腾空） */
         #ling-time-dot:hover { 
             transform: translateX(0) scale(1.12) !important; 
             opacity: 1 !important;
-            /* 投影向下大幅拉长，模糊度增加，模拟腾空 */
-            --ling-shadow-y: 16px !important;
-            --ling-shadow-blur: 36px !important;
-            --ling-shadow-opacity: 0.65 !important;
+            --ling-shadow-y: 15px !important;
+            --ling-shadow-blur: 32px !important;
+            --ling-shadow-opacity: 0.55 !important;
         }
-        #ling-time-dot:hover::before { border: 1px dashed rgba(197, 160, 89, 0.6); transform: rotate(180deg); }
         
-        #ling-time-dot.state-day:hover    { --ling-inset-border-color: rgba(0, 0, 0, 0.7); }
-        #ling-time-dot.state-night:hover  { --ling-inset-border-color: rgba(197, 160, 89, 0.75); }
-        #ling-time-dot.state-sunset:hover { --ling-inset-border-color: rgba(255, 78, 80, 0.85); }
-        #ling-time-dot.state-sky:hover    { --ling-inset-border-color: rgba(6, 182, 212, 0.85); }
+        /* 激活外圈雾化霓虹 */
+        #ling-time-dot:hover::before { 
+            opacity: 0.85; 
+        }
+        
+        #ling-time-dot.state-day:hover    { --ling-inset-border-color: rgba(0, 0, 0, 0.65); }
+        #ling-time-dot.state-night:hover  { --ling-inset-border-color: rgba(197, 160, 89, 0.7); }
+        #ling-time-dot.state-sunset:hover { --ling-inset-border-color: rgba(255, 78, 80, 0.8); }
+        #ling-time-dot.state-sky:hover    { --ling-inset-border-color: rgba(6, 182, 212, 0.8); }
 
         #ling-time-dot.state-day:hover #ling-time-text { color: #000000 !important; font-weight: 900 !important; text-shadow: 0px 1px 2px rgba(255, 255, 255, 0.9), 0px 0px 4px rgba(147, 197, 253, 0.6); }
         #ling-time-dot.state-night:hover #ling-time-text { color: #111317 !important; font-weight: 900 !important; -webkit-text-stroke: 0.5px #c5a059; text-shadow: 0 0 6px rgba(167, 139, 250, 0.85); }
@@ -187,12 +216,9 @@
         #ling-time-dot:active { 
             transform: translateX(0) scale(0.95) !important; 
             --ling-shadow-y: 2px !important;
-            --ling-shadow-blur: 6px !important;
+            --ling-shadow-blur: 5px !important;
         }
-
-        /* 星轨自转动画 */
-        .run-rotate-day::before { animation: starRotateClockwise 25s linear infinite; }
-        .run-rotate-night::before { animation: starRotateClockwise 30s linear infinite; }
+        #ling-time-dot:active::before { opacity: 0.2; }
 
         /* 时辰突变震荡 */
         .ling-pulse-trigger { animation: lingShock 0.45s cubic-bezier(0.25, 1, 0.5, 1) !important; }
@@ -202,20 +228,19 @@
             100% { transform: translateX(0) scale(1); }
         }
 
-        /* 【方案一动画：真玉表面高光不间断拂过】 */
+        /* 【承袭精髓动画：300%大背景平滑流转，来回循环往复】 */
+        @keyframes lingStreamMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* 玉面高光掠影 */
         @keyframes lingJadeGlint {
             0% { left: -150%; }
-            30% { left: 150%; }
-            100% { left: 150%; } /* 留出留白时间，防止高光闪烁过频 */
+            25% { left: 150%; }
+            100% { left: 150%; } 
         }
-
-        /* 【方案三动画：界域斜面灵气缓慢律动吞吐】 */
-        @keyframes lingSlopeBreath {
-            0%, 100% { filter: brightness(1); }
-            50% { filter: brightness(1.2) contrast(1.1); }
-        }
-
-        @keyframes starRotateClockwise { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         @media screen and (max-width: 768px) {
             #ling-time-dot { width: 40px; height: 40px; }
@@ -274,10 +299,9 @@
             const lightX = 45 - (deltaX / distance) * 16 * influence;
             const lightY = 45 - (deltaY / distance) * 16 * influence;
             
-            // 方案二增强：神识越近，投影越产生自然的偏角偏折
-            const shadowX = (deltaX / distance) * 12 * influence;
-            const shadowY = 8 + (deltaY / distance) * 12 * influence;
-            const shadowBlur = 24 + influence * 12;
+            const shadowX = (deltaX / distance) * 10 * influence;
+            const shadowY = 6 + (deltaY / distance) * 10 * influence;
+            const shadowBlur = 20 + influence * 10;
 
             dot.style.setProperty('--ling-light-x', `${lightX}%`);
             dot.style.setProperty('--ling-light-y', `${lightY}%`);
@@ -293,9 +317,9 @@
         dot.style.setProperty('--ling-light-x', '45%');
         dot.style.setProperty('--ling-light-y', '45%');
         dot.style.setProperty('--ling-shadow-x', '0px');
-        dot.style.setProperty('--ling-shadow-y', '8px');
-        dot.style.setProperty('--ling-shadow-blur', '24px');
-        dot.style.setProperty('--ling-shadow-opacity', '0.45');
+        dot.style.setProperty('--ling-shadow-y', '6px');
+        dot.style.setProperty('--ling-shadow-blur', '20px');
+        dot.style.setProperty('--ling-shadow-opacity', '0.35');
     }
 
     // ================= 4. 纳芥半隐与智能双向折叠算法 =================
@@ -315,10 +339,9 @@
             isFolded = true;
             dot.style.opacity = '0.35'; 
             
-            // 【方案二折叠细节】：折叠归位时，投影几乎抹平，达成融入边缘沉淀感
-            dot.style.setProperty('--ling-shadow-y', '2px');
-            dot.style.setProperty('--ling-shadow-blur', '4px');
-            dot.style.setProperty('--ling-shadow-opacity', '0.2');
+            dot.style.setProperty('--ling-shadow-y', '1px');
+            dot.style.setProperty('--ling-shadow-blur', '3px');
+            dot.style.setProperty('--ling-shadow-opacity', '0.15');
 
             if (isExactlyOnLeft || rect.left < winWidth / 2) {
                 dot.style.setProperty('--ling-fold-transform', 'translateX(-68%)');
@@ -397,9 +420,6 @@
             });
             
             dot.className = shellState;
-            dot.classList.remove('run-rotate-day', 'run-rotate-night');
-            if (currentKey === 'day') dot.classList.add('run-rotate-day');
-            if (currentKey === 'night') dot.classList.add('run-rotate-night');
             textLayer.className = textStyle;
             if (lastKey !== "") triggerShockwave();
             lastKey = currentKey;
