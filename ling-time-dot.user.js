@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         灵界时辰天道液态玻璃珠 (v20.6.6 篆印轮转版)
+// @name         灵界时辰天道液态玻璃珠 (v20.6.7 纳芥袖珍版)
 // @namespace    http://tampermonkey.net/
-// @version      20.6.6
-// @description  基于20.6.5本源独立版。视觉史诗级跃迁：引入云端古法篆书字体、重构四象法相多图层丝滑交替消融机制，文字稳固悬浮。
+// @version      20.6.7
+// @description  基于20.6.6大版本。极致袖珍化微调：缩小古法篆体真言字号，拉大内部留白，使法宝界面更显玲珑精致、微雕质感。
 // @author       修仙道友
 // @match        https://ling.muge.info/game.html
 // @match        http://ling.muge.info/game.html
@@ -14,7 +14,7 @@
 (function() {
     'use strict';
 
-    // 引入云端古法篆书字体（全字库说文解字篆体），若加载略慢会优雅降级为系统楷体/隶书
+    // 引入云端古法篆书字体
     const FONT_LINK = document.createElement('link');
     FONT_LINK.href = 'https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@700;900&display=swap'; 
     document.head.appendChild(FONT_LINK);
@@ -32,7 +32,7 @@
     fontStyleNode.textContent = AMBIENT_FONT;
     document.head.appendChild(fontStyleNode);
 
-    // ================= 1. 殿堂级天道美化 CSS (架构大重构) =================
+    // ================= 1. 殿堂级天道美化 CSS (袖珍精细化微调) =================
     const STYLES = `
         /* 1. 法宝外壳及主容器 */
         #ling-time-dot {
@@ -49,7 +49,7 @@
             align-items: center;
             justify-content: center;
             box-sizing: border-box;
-            overflow: hidden; /* 锁住内部四象法相的溢出光效 */
+            overflow: hidden; 
             
             backdrop-filter: blur(12px) saturate(210%);
             -webkit-backdrop-filter: blur(12px) saturate(210%);
@@ -67,15 +67,14 @@
                         transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        /* 2. 【20.6.6核心重构】四象法相独立底色图层 */
+        /* 2. 四象法相独立底色图层 */
         .ling-aura-layer {
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
             border-radius: 50%;
-            opacity: 0; /* 默认隐没于虚无 */
+            opacity: 0; 
             z-index: 1;
             background-size: 160% 160%, 100% 100%;
-            /* 核心：1.5秒的极度丝滑消融过渡动画 */
             transition: opacity 1.5s cubic-bezier(0.4, 0, 0.2, 1); 
         }
 
@@ -94,27 +93,25 @@
                 radial-gradient(circle at 54% 54%, rgba(29, 78, 216, 0.6) 0%, rgba(20, 24, 30, 0.8) 75%, rgba(10, 12, 15, 0.95) 100%);
             animation: tideNightPure 14s infinite cubic-bezier(0.25, 1, 0.2, 1);
         }
-        .aura-sunset {
-            background: radial-gradient(circle at 45% 45%, #ff4e50 0%, #f97316 50%, #feb47b 100%);
-        }
-        .aura-sky {
-            background: radial-gradient(circle at 45% 45%, #06b6d4 0%, #3b82f6 50%, #111827 100%);
-        }
+        .aura-sunset { background: radial-gradient(circle at 45% 45%, #ff4e50 0%, #f97316 50%, #feb47b 100%); }
+        .aura-sky { background: radial-gradient(circle at 45% 45%, #06b6d4 0%, #3b82f6 50%, #111827 100%); }
 
-        /* 当此图层法相激活时，丝滑浮现 */
         .ling-aura-layer.active { opacity: 1; }
 
-        /* 3. 【20.6.6核心重构】天道古法真言层 (绝对正向、不受任何图层和旋转影响) */
+        /* 3. 【20.6.7 核心调优】袖珍真言层 (降低字号，拉出边缘留白空间) */
         #ling-time-text {
             position: relative;
-            z-index: 5; /* 凌驾于所有四象法相图层之上 */
-            font-family: "ShuowenZuan", "LiSu", "KaiTi", serif; /* 篆体优先 */
-            font-size: 20px; /* 篆体字形特殊，略微调大字号彰显神韵 */
+            z-index: 5; 
+            font-family: "ShuowenZuan", "LiSu", "KaiTi", serif; 
+            font-size: 14px; /* 从 20px 缩敛至 14px，视觉聚焦更为袖珍 */
             font-weight: 700;
             text-align: center;
             line-height: 44px;
             width: 100%; height: 100%;
             display: flex; align-items: center; justify-content: center;
+            /* 篆体字形普遍靠上，加一个微调位移确保在小字号下绝对居中 */
+            padding-top: 1px; 
+            box-sizing: border-box;
             transition: color 0.2s ease-in-out, 
                         text-shadow 0.2s ease-in-out, 
                         -webkit-text-stroke 0.2s ease-in-out, 
@@ -123,39 +120,36 @@
 
         /* 4. 处于不同界域时，真言文字字体的基础调色 */
         .text-day-style { color: #2c353e; text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8); -webkit-text-stroke: 0px transparent; }
-        .text-night-style { color: #e2e8f0; text-shadow: 0 1px 4px rgba(139, 92, 246, 0.8); -webkit-text-stroke: 0px transparent; }
-        .text-sunset-style { color: #ffffff; text-shadow: 0 1px 4px rgba(255, 0, 0, 0.7); -webkit-text-stroke: 0px transparent; }
-        .text-sky-style { color: #ffffff; text-shadow: 0 1px 4px rgba(0, 136, 255, 0.8); -webkit-text-stroke: 0px transparent; }
+        .text-night-style { color: #e2e8f0; text-shadow: 0 1px 3px rgba(139, 92, 246, 0.8); -webkit-text-stroke: 0px transparent; }
+        .text-sunset-style { color: #ffffff; text-shadow: 0 1px 3px rgba(255, 0, 0, 0.7); -webkit-text-stroke: 0px transparent; }
+        .text-sky-style { color: #ffffff; text-shadow: 0 1px 3px rgba(0, 136, 255, 0.8); -webkit-text-stroke: 0px transparent; }
 
-        /* 5. 悬浮激活态（法宝外壳整体微调，内部各动画暂停） */
+        /* 5. 悬浮激活态 */
         #ling-time-dot:hover { transform: scale(1.12); }
         #ling-time-dot:hover .ling-aura-layer { animation-play-state: paused !important; }
         #ling-time-dot:hover::before, #ling-time-dot:hover::after { animation-play-state: paused !important; }
 
-        /* 【20.6.6新规】白昼 Hover 篆体字形爆破显化 */
+        /* 袖珍版 Hover 篆体字形爆破显化（字号略微回升到 15px 配合描边，保持袖珍美感） */
         #ling-time-dot.state-day:hover #ling-time-text {
-            color: #000000 !important; font-weight: 900 !important; -webkit-text-stroke: 0.7px #000000; 
+            font-size: 15px; color: #000000 !important; font-weight: 900 !important; -webkit-text-stroke: 0.5px #000000; 
             text-shadow: 0px 1px 2px rgba(255, 255, 255, 0.9);
         }
-        /* 【20.6.6新规】黑夜 Hover 篆体字形爆破显化 */
         #ling-time-dot.state-night:hover #ling-time-text {
-            color: #050508 !important; font-weight: 900 !important; -webkit-text-stroke: 0.9px #c5a059; 
-            text-shadow: 0 0 6px rgba(139, 92, 246, 0.9), 0 0 12px rgba(29, 78, 216, 0.7);
+            font-size: 15px; color: #050508 !important; font-weight: 900 !important; -webkit-text-stroke: 0.7px #c5a059; 
+            text-shadow: 0 0 5px rgba(139, 92, 246, 0.9), 0 0 10px rgba(29, 78, 216, 0.7);
         }
-        /* 夕照 Hover 显化 */
         #ling-time-dot.state-sunset:hover #ling-time-text {
-            color: #4a0000 !important; font-weight: 900 !important; -webkit-text-stroke: 0.7px #4a0000;
-            text-shadow: 0 0 8px rgba(255, 78, 80, 0.8);
+            font-size: 15px; color: #4a0000 !important; font-weight: 900 !important; -webkit-text-stroke: 0.5px #4a0000;
+            text-shadow: 0 0 6px rgba(255, 78, 80, 0.8);
         }
-        /* 破晓 Hover 显化 */
         #ling-time-dot.state-sky:hover #ling-time-text {
-            color: #001133 !important; font-weight: 900 !important; -webkit-text-stroke: 0.7px #001133;
-            text-shadow: 0 0 8px rgba(6, 182, 212, 0.9);
+            font-size: 15px; color: #001133 !important; font-weight: 900 !important; -webkit-text-stroke: 0.5px #001133;
+            text-shadow: 0 0 6px rgba(6, 182, 212, 0.9);
         }
 
         #ling-time-dot:active { transform: scale(0.95); }
 
-        /* 6. 外围浑天星轨 (作为独立装饰，不影响容器内部消融) */
+        /* 6. 外围浑天星轨 */
         #ling-time-dot::before {
             content: ''; position: absolute; top: -6px; left: -6px; right: -6px; bottom: -6px;
             border-radius: 50%; border: 1px dashed rgba(255, 255, 255, 0.15);
@@ -196,9 +190,14 @@
         @keyframes starRotateClockwise { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         @keyframes starRotateCounter { 0% { transform: rotate(0deg); } 100% { transform: rotate(-360deg); } }
 
+        /* 移动端更精细的比例缩减 */
         @media screen and (max-width: 768px) {
             #ling-time-dot { width: 40px; height: 40px; }
-            #ling-time-text { font-size: 17px; line-height: 40px; }
+            #ling-time-text { font-size: 13px; line-height: 40px; }
+            #ling-time-dot.state-day:hover #ling-time-text,
+            #ling-time-dot.state-night:hover #ling-time-text,
+            #ling-time-dot.state-sunset:hover #ling-time-text,
+            #ling-time-dot.state-sky:hover #ling-time-text { font-size: 14px; }
         }
     `;
 
@@ -210,7 +209,6 @@
     const dot = document.createElement('div');
     dot.id = 'ling-time-dot';
 
-    // 创建四个独立的四象法相背景图层
     const auraLayers = {
         'day': createAuraLayer('aura-day'),
         'night': createAuraLayer('aura-night'),
@@ -219,7 +217,6 @@
     };
     Object.values(auraLayers).forEach(layer => dot.appendChild(layer));
 
-    // 创建独立的正向真言文字层
     const textLayer = document.createElement('div');
     textLayer.id = 'ling-time-text';
     textLayer.textContent = '---';
@@ -247,7 +244,7 @@
         }
     }
 
-    // ================= 3. 核心解耦切换逻辑 (四象法相消融 + 篆体更替) =================
+    // ================= 3. 核心解耦切换逻辑 =================
     let lastKey = ""; 
 
     function triggerShockwave() {
@@ -266,9 +263,9 @@
         const hour = hourMatch[1];
         if (textLayer.textContent !== hour) textLayer.textContent = hour; 
 
-        let currentKey = ""; // day, night, sunset, sky
-        let textStyle = "";  // 对应文字的基础调色样式
-        let shellState = ""; // 赋予外壳的hover判定状态
+        let currentKey = ""; 
+        let textStyle = "";  
+        let shellState = ""; 
 
         switch (hour) {
             case '寅': currentKey = "sky"; textStyle = "text-sky-style"; shellState = "state-sky"; break;
@@ -279,9 +276,7 @@
                 currentKey = "night"; textStyle = "text-night-style"; shellState = "state-night"; break;
         }
 
-        // 当界域真实发生演变轮转时
         if (lastKey !== currentKey) {
-            // 1. 平滑切换四象法相底色图层的 active 状态 (触发 CSS 1.5s 渐隐渐现)
             Object.keys(auraLayers).forEach(key => {
                 if (key === currentKey) {
                     auraLayers[key].classList.add('active');
@@ -290,18 +285,14 @@
                 }
             });
 
-            // 2. 更新灵珠外壳分类，决定 hover 时的篆印反差色
             dot.className = shellState;
 
-            // 3. 更新外部装饰星轨的自转动画类型
             dot.classList.remove('run-rotate-day', 'run-rotate-night');
             if (currentKey === 'day') dot.classList.add('run-rotate-day');
             if (currentKey === 'night') dot.classList.add('run-rotate-night');
 
-            // 4. 更替真言基础色调
             textLayer.className = textStyle;
 
-            // 5. 触发瞬时灵脉震荡（首次加载除外）
             if (lastKey !== "") triggerShockwave();
 
             lastKey = currentKey;
