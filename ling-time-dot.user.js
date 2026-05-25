@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         灵界时辰天道液态玻璃珠 (v20.6.4 真言悬浮版)
+// @name         灵界时辰天道液态玻璃珠 (v20.6.5 本源独立版)
 // @namespace    http://tampermonkey.net/
-// @version      20.6.4
-// @description  基于20.6.3光效天化版。极致细节修正：文字保持绝对正向悬浮不自转，仅内部双核光效与浑天星轨产生天道偏光自转与潮汐律动。
+// @version      20.6.5
+// @description  基于20.6.4真言悬浮版。彻底重构逻辑：去掉游戏原生昼夜判定，灵珠光效状态完全由时辰汉字（地支）独立自主掌控。
 // @author       修仙道友
 // @match        https://ling.muge.info/game.html
 // @match        http://ling.muge.info/game.html
@@ -14,7 +14,7 @@
 (function() {
     'use strict';
 
-    // ================= 1. 殿堂级天道美化 CSS (文字锁定不转) =================
+    // ================= 1. 殿堂级天道美化 CSS =================
     const STYLES = `
         #ling-time-dot {
             position: fixed;
@@ -44,7 +44,6 @@
                 inset -4px -4px 8px rgba(0, 0, 0, 0.45),            
                 inset 0 0 12px rgba(255, 255, 255, 0.2);           
                 
-            /* 状态流转动画过渡 (主体不再包含 transform 旋转过渡，确保文字永远正向) */
             transition: background 1.2s cubic-bezier(0.4, 0, 0.2, 1), 
                         color 0.2s ease-in-out, 
                         border-color 0.8s ease-in-out, 
@@ -55,7 +54,7 @@
                         transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        /* 【20.6.4 关键重构】星轨::before：承载挂机日常的白昼自转与潮汐 */
+        /* 星轨::before：白昼自转与潮汐 */
         #ling-time-dot::before {
             content: '';
             position: absolute;
@@ -68,7 +67,7 @@
             transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
-        /* 【20.6.4 关键重构】星轨::after：承载挂机日常的黑夜自转与潮汐 */
+        /* 星轨::after：黑夜自转与潮汐 */
         #ling-time-dot::after {
             content: '';
             position: absolute;
@@ -82,31 +81,22 @@
             transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
-        /* 悬浮激活态（仅放大主体，星轨自转动画暂停） */
-        #ling-time-dot:hover {
-            transform: scale(1.12);
-        }
-        #ling-time-dot:hover::before, #ling-time-dot:hover::after {
-            animation-play-state: paused !important;
-        }
+        /* 悬浮激活态（文字绝对不动，星轨动画暂停） */
+        #ling-time-dot:hover { transform: scale(1.12); }
+        #ling-time-dot:hover::before, #ling-time-dot:hover::after { animation-play-state: paused !important; }
         
-        /* 悬浮时星轨共鸣错位 */
         #ling-time-dot:hover::before {
             border: 1px dashed rgba(197, 160, 89, 0.6);
-            transform: rotate(180deg); 
-            top: -8px; left: -8px; right: -8px; bottom: -8px;
-            opacity: 1;
+            transform: rotate(180deg); top: -8px; left: -8px; right: -8px; bottom: -8px; opacity: 1;
         }
         #ling-time-dot:hover::after {
             border: 1px dashed rgba(230, 230, 230, 0.15); 
-            transform: rotate(-120deg);
-            top: -14px; left: -14px; right: -14px; bottom: -14px;
-            opacity: 1;
+            transform: rotate(-120deg); top: -14px; left: -14px; right: -14px; bottom: -14px; opacity: 1;
         }
 
         #ling-time-dot:active { transform: scale(0.95); }
 
-        /* 时辰突变时的瞬时“天机震荡” (文字主体不产生旋转，仅外放光晕震荡) */
+        /* 时辰突变震荡 */
         .ling-pulse-trigger { animation: lingShock 0.45s cubic-bezier(0.25, 1, 0.5, 1) !important; }
         @keyframes lingShock {
             0% { transform: scale(1); box-shadow: 0 0 0px rgba(255,255,255,0); }
@@ -114,89 +104,52 @@
             100% { transform: scale(1); box-shadow: 0 10px 30px rgba(0,0,0,0.45); }
         }
 
-        /* --- 【20.6.4 光效进化】只让 background-position 进行偏光位移与潮汐，不旋转整体 --- */
+        /* 潮汐位移动画 */
         @keyframes tideDayPure {
-            0% { 
-                box-shadow: 0 10px 30px rgba(0,0,0,0.45), inset 5px 5px 10px rgba(255,255,255,0.6);
-                background-position: 0% 0%, 100% 100%;
-            }
-            15% { 
-                box-shadow: 0 12px 35px rgba(138,180,248,0.25), inset 5px 5px 10px rgba(255,255,255,0.7);
-                background-position: 30% 20%, 70% 80%; /* 核心在爆发时产生微观错位 */
-            }
-            100% { 
-                box-shadow: 0 10px 30px rgba(0,0,0,0.45), inset 5px 5px 10px rgba(255,255,255,0.6);
-                background-position: 0% 0%, 100% 100%;
-            }
+            0%, 100% { box-shadow: 0 10px 30px rgba(0,0,0,0.45), inset 5px 5px 10px rgba(255,255,255,0.6); background-position: 0% 0%, 100% 100%; }
+            15% { box-shadow: 0 12px 35px rgba(138,180,248,0.25), inset 5px 5px 10px rgba(255,255,255,0.7); background-position: 30% 20%, 70% 80%; }
         }
-        
         @keyframes tideNightPure {
-            0% { 
-                box-shadow: 0 10px 30px rgba(0,0,0,0.45), 0 0 15px rgba(139,92,246,0.1);
-                background-position: 0% 100%, 100% 0%;
-            }
-            15% { 
-                box-shadow: 0 14px 35px rgba(0,0,0,0.5), 0 0 25px rgba(139,92,246,0.3);
-                background-position: 40% 60%, 60% 40%; /* 偏光游走 */
-            }
-            100% { 
-                box-shadow: 0 10px 30px rgba(0,0,0,0.45), 0 0 15px rgba(139,92,246,0.1);
-                background-position: 0% 100%, 100% 0%;
-            }
+            0%, 100% { box-shadow: 0 10px 30px rgba(0,0,0,0.45), 0 0 15px rgba(139,92,246,0.1); background-position: 0% 100%, 100% 0%; }
+            15% { box-shadow: 0 14px 35px rgba(0,0,0,0.5), 0 0 25px rgba(139,92,246,0.3); background-position: 40% 60%, 60% 40%; }
         }
 
-        /* 让外部dashed星轨在日常挂机时静谧自转 */
         @keyframes starRotateClockwise { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         @keyframes starRotateCounter { 0% { transform: rotate(0deg); } 100% { transform: rotate(-360deg); } }
 
-        /* 1. 白昼极光 */
+        /* 1. 白昼极光 (卯、辰、巳、午、未、申) */
         .ling-state-day {
             background-color: #f4f3f0;
-            color: #2c353e; 
-            font-weight: 700;
+            color: #2c353e; font-weight: 700;
             border: 1px solid rgba(255, 255, 255, 0.55);
             text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
-            
-            /* 双核异色复合辐射 */
             background-image: 
                 radial-gradient(circle at 45% 45%, rgba(138, 180, 248, 0.9) 0%, transparent 45%), 
                 radial-gradient(circle at 52% 52%, rgba(255, 182, 193, 0.6) 0%, rgba(244, 243, 240, 0.2) 70%, rgba(230, 225, 215, 0.6) 100%);
             background-size: 160% 160%, 100% 100%;
-            
-            /* 主体只进行潮汐与偏光，不自转 */
             animation: tideDayPure 14s infinite cubic-bezier(0.25, 1, 0.2, 1); 
         }
-        /* 让白昼的内圈星轨缓缓自转 */
         .ling-state-day::before { animation: starRotateClockwise 25s linear infinite; }
-        
-        /* 白昼 Hover：字形显化 */
         .ling-state-day:hover {
             color: #000000 !important; font-weight: 900 !important; -webkit-text-stroke: 0.6px #000000; 
             text-shadow: 0px 1px 2px rgba(255, 255, 255, 0.9); 
             box-shadow: 0 18px 45px rgba(0, 0, 0, 0.55), inset 7px 7px 12px rgba(255, 255, 255, 0.7);
         }
         
-        /* 2. 黑夜霓虹 */
+        /* 2. 黑夜霓虹 (戌、亥、子、丑) */
         .ling-state-night {
             background-color: #111;
-            color: #e2e8f0; 
-            font-weight: 700;
+            color: #e2e8f0; font-weight: 700;
             border: 1px solid rgba(197, 160, 89, 0.35);
             text-shadow: 0 1px 4px rgba(139, 92, 246, 0.8);
-            
-            /* 双核异色复合辐射 */
             background-image: 
                 radial-gradient(circle at 46% 46%, rgba(139, 92, 246, 0.95) 0%, transparent 50%), 
                 radial-gradient(circle at 54% 54%, rgba(29, 78, 216, 0.6) 0%, rgba(20, 24, 30, 0.8) 75%, rgba(10, 12, 15, 0.95) 100%);
             background-size: 160% 160%, 100% 100%;
-            
             animation: tideNightPure 14s infinite cubic-bezier(0.25, 1, 0.2, 1);
         }
-        /* 让黑夜的内圈和外圈星轨反向自转，拉满玄学感 */
         .ling-state-night::before { animation: starRotateClockwise 30s linear infinite; }
         .ling-state-night::after { border: 1px dashed rgba(255, 255, 255, 0.05); opacity: 0.5; animation: starRotateCounter 40s linear infinite; }
-        
-        /* 黑夜 Hover：字形显化 */
         .ling-state-night:hover {
             color: #050508 !important; font-weight: 900 !important; -webkit-text-stroke: 0.8px #c5a059; 
             text-shadow: 0 0 6px rgba(139, 92, 246, 0.9), 0 0 12px rgba(29, 78, 216, 0.7);
@@ -242,7 +195,7 @@
     styleNode.textContent = STYLES;
     document.head.appendChild(styleNode);
 
-    // ================= 2. 创建圆点 DOM 并读取历史记忆位置 =================
+    // ================= 2. 创建 DOM 并读取历史位置 =================
     const dot = document.createElement('div');
     dot.id = 'ling-time-dot';
     dot.className = 'ling-state-unknown'; 
@@ -263,14 +216,12 @@
         }
     }
 
-    // ================= 3. 核心解耦切换逻辑 =================
+    // ================= 3. 核心解耦切换逻辑 (【20.6.5 斩断因果】) =================
     let lastClass = "";
 
     function triggerShockwave() {
         dot.classList.add('ling-pulse-trigger');
-        setTimeout(() => {
-            dot.classList.remove('ling-pulse-trigger');
-        }, 450); 
+        setTimeout(() => { dot.classList.remove('ling-pulse-trigger'); }, 450); 
     }
 
     function updateDotStyle() {
@@ -292,19 +243,33 @@
         const hour = hourMatch[1];
         if (dot.textContent !== hour) dot.textContent = hour; 
 
-        const isNightClass = headerNode.classList.contains('is-night');
-        const isNightText = rawText.includes('(夜)');
-        const isActuallyNight = isNightClass || isNightText;
-
+        // --- 核心重构：彻底删除原生 is-night 与 (夜) 的状态获取 ---
         let currentClass = "";
-        if (hour === '酉' && !isActuallyNight) {
-            currentClass = "ling-state-sunset";
-        } else if (hour === '寅' && isActuallyNight) {
-            currentClass = "ling-state-sky";
-        } else if (isActuallyNight) {
-            currentClass = "ling-state-night";
-        } else {
-            currentClass = "ling-state-day";
+        
+        // 按照纯粹的地支属性，进行大界域光效分配
+        switch (hour) {
+            case '寅':
+                currentClass = "ling-state-sky";     // 破晓冰蓝
+                break;
+            case '酉':
+                currentClass = "ling-state-sunset";  // 夕照琥珀
+                break;
+            case '卯':
+            case '辰':
+            case '巳':
+            case '午':
+            case '未':
+            case '申':
+                currentClass = "ling-state-day";     // 绝对白昼
+                break;
+            case '戌':
+            case '亥':
+            case '子':
+            case '丑':
+                currentClass = "ling-state-night";   // 绝对黑夜
+                break;
+            default:
+                currentClass = "ling-state-unknown";
         }
 
         if (lastClass !== currentClass) {
@@ -343,20 +308,16 @@
 
     const moveDrag = (clientX, clientY, isTouch = false) => {
         if (!isDragging) return;
-        
         let targetLeft = clientX - offsetX;
         let targetTop = clientY - offsetY;
-        
         if (isTouch) {
             const currentLeft = parseFloat(dot.style.left) || dot.getBoundingClientRect().left;
             const currentTop = parseFloat(dot.style.top) || dot.getBoundingClientRect().top;
             targetLeft = currentLeft + (targetLeft - currentLeft) * 0.85; 
             targetTop = currentTop + (targetTop - currentTop) * 0.85;
         }
-        
         const maxLeft = window.innerWidth - dot.offsetWidth;
         const maxTop = window.innerHeight - dot.offsetHeight;
-        
         dot.style.left = Math.max(0, Math.min(maxLeft, targetLeft)) + 'px';
         dot.style.top = Math.max(0, Math.min(maxTop, targetTop)) + 'px';
         dot.style.right = 'auto';
@@ -365,9 +326,7 @@
     const endDrag = () => {
         if (!isDragging) return;
         isDragging = false;
-        
         dot.style.transition = 'background 0.8s, color 0.2s, border-color 0.8s, left 0.15s ease, top 0.15s ease, text-shadow 0.2s, -webkit-text-stroke 0.2s, font-weight 0.2s, transform 0.2s ease';
-        
         localStorage.setItem('ling_time_dot_position', JSON.stringify({
             left: parseFloat(dot.style.left),
             top: parseFloat(dot.style.top)
