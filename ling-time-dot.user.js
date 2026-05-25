@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         灵界时辰天道罗盘
 // @namespace    http://tampermonkey.net/
-// @version      20.7.1
-// @description  交互视觉终极版。拟物风格重工业级重构：大圆套小圆（古法仙金外圈+温润灵玉内圈），篆体真言在灵玉核心以压铸浮雕式显化。
+// @version      20.7.2
+// @description  拟物交互视觉大成版。新增“雷劫消弥”级联斜面：大圆到小圆引入仙金坡面，不仅消除了生硬感，更让描边随界域灵气动态晕染，尽显法宝圆满质感。
 // @author       修仙道友
 // @match        https://ling.muge.info/game.html
 // @match        http://ling.muge.info/game.html
@@ -41,12 +41,12 @@
             --ling-shadow-y: 10px;
             --ling-shadow-blur: 30px;
             
-            /* 【20.7.1 独创】四象金丝描边与灵玉核心底色变量 */
+            /* 【20.7.2 核心进化】界域向内晕染描边变量，不仅决定锁灵金丝，也决定过渡斜面的色调 */
             --ling-inset-border-color: rgba(255, 255, 255, 0.4);
             --ling-jade-bg-color: #f4f3f0;
         }
 
-        /* 1. 【拟物化重塑：法宝主体】—— 成为拟物的金属与玉石复合外壳 */
+        /* 1. 法宝主体 —— 罗盘仙金外壳大圆 */
         #ling-time-dot {
             position: fixed;
             top: 85px;
@@ -59,163 +59,144 @@
             user-select: none;
             box-sizing: border-box;
             
-            /* 物理毛玻璃裁切，保留通透质感的同时锁住内部结构 */
+            /* 物理毛玻璃，锁住内部多层拟物架构 */
             backdrop-filter: blur(10px) saturate(180%);
             -webkit-backdrop-filter: blur(10px) saturate(180%);
             
-            /* 【20.7.1 核心改动：厚重的拟物复合阴影（金属光泽+重墨阴影）】 */
+            /* 【20.7.2 核心重磅改动：铸造大圆到小圆的3D坡面级联过渡（斜面美学）】 */
             box-shadow: 
-                var(--ling-shadow-x) var(--ling-shadow-y) var(--ling-shadow-blur) rgba(0, 0, 0, 0.5), /* 鼠标联动外部阴影 */
+                /* A. 鼠标联动外部阴影 */
+                var(--ling-shadow-x) var(--ling-shadow-y) var(--ling-shadow-blur) rgba(0, 0, 0, 0.5),
                 
-                inset -2px -2px 6px rgba(0, 0, 0, 0.4),  /* 底部向内暗面阴影，强化球体下沉感 */
-                inset 0px 0px 0px 2px rgba(255, 255, 255, 0.2); /* 金属外圈顶部的微微高光包边 */
+                /* B. 罗盘整体底部拟物下沉暗面 */
+                inset -2px -2px 6px rgba(0, 0, 0, 0.4),
+                
+                /* C. 大圆外围金属高光包边 */
+                inset 0px 0px 0px 1px rgba(255, 255, 255, 0.2),
 
-            /* 绝对锁向的外层 dashed 装饰星轨，作为独立装饰剥离 */
+                /* 【20.7.2 独创：大圆凹陷到小圆灵玉核心的级联斜面（Bevel Slope）】 */
+                /* 坡面深度3px，混合了仙金的暗面阴影与当前界域灵气的反光（--ling-inset-border-color） */
+                inset 0px 0px 4px 3px rgba(0, 0, 0, 0.35),               /* 斜坡暗面压铸 */
+                inset 0px 0px 2px 3px var(--ling-inset-border-color);   /* 斜坡上的天道界域光晕晕染 */
+
             border: 1px dashed rgba(255, 255, 255, 0.1); 
             
-            /* 平滑过渡动画 */
-            transition: box-shadow 0.25s cubic-bezier(0.25, 1, 0.5, 1),
+            transition: box-shadow 0.3s cubic-bezier(0.25, 1, 0.5, 1),
                         opacity 0.6s cubic-bezier(0.25, 1, 0.5, 1),
                         transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        /* 2. 【20.7.1 独创】大圆与小圆的拟物复合架构 */
-        
-        /* [小圆·灵玉核心层] */
+        /* 2. 小圆·灵玉核心层 (篡体真言居于此处，稳固不自转) */
         #ling-jade-core {
             position: absolute;
-            top: 4px; left: 4px; right: 4px; bottom: 4px;
+            /* 因外壳大圆增加了拟物斜面坡度（3px Bevel Slope），内部核心小圆需要向内收敛，才能刚好落在坡面底部 */
+            top: 6px; left: 6px; right: 6px; bottom: 6px; /* 从之前的 4px 纳芥袖珍调整为 6px 级联下沉 */
             border-radius: 50%;
             z-index: 5;
             box-sizing: border-box;
-            overflow: hidden; /* 锁死一切向内的光效 */
+            overflow: hidden; /* 锁死核心内部一切呼吸光效 */
             
-            /* 温润灵玉质感底色 */
+            /* 温润灵玉底色 */
             background-color: var(--ling-jade-bg-color);
             
-            /* 【20.7.1 核心：小圆的拟物描边（inset border）】 */
+            /* 【20.7.2 核心：小圆的拟物描边（inset border）】 */
             box-shadow: 
-                inset 1px 1px 3px rgba(255, 255, 255, 0.7), /* 核心顶部的晶体折射高光 */
-                inset -1px -1px 3px rgba(0, 0, 0, 0.25),   /* 核心底部暗面阴影 */
-                inset 0 0 0 1px var(--ling-inset-border-color); /* 时辰金丝描边 */
+                inset 1px 1px 3px rgba(255, 255, 255, 0.7), /* 玉石顶部晶体高光折射 */
+                inset -1px -1px 3px rgba(0, 0, 0, 0.25),   /* 玉石底部暗面阴影 */
+                inset 0 0 0 1px var(--ling-inset-border-color); /* 锁灵金丝描边 */
             
             transition: background-color 1.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         /* [大圆与小圆之间的夹层·金属装饰圈] */
         #ling-time-dot::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            border-radius: 50%;
-            z-index: 1; /* 处于罗盘外壳之下 */
-            border: 1px dashed rgba(255, 255, 255, 0.15); /* 日常静谧虚线星轨 */
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            border-radius: 50%; z-index: 1; border: 1px dashed rgba(255, 255, 255, 0.15); /* 装饰星轨 */
             pointer-events: none;
             transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
         }
         
-        /* 用于黑夜的逆向自转dashed虚线 */
         #ling-time-dot::after {
-            content: '';
-            position: absolute;
-            top: -6px; left: -6px; right: -6px; bottom: -6px;
-            border-radius: 50%;
-            background: transparent;
-            border: 1px dashed rgba(255, 255, 255, 0); 
-            z-index: 0;
+            content: ''; position: absolute; top: -6px; left: -6px; right: -6px; bottom: -6px;
+            border-radius: 50%; background: transparent; border: 1px dashed rgba(255, 255, 255, 0); z-index: 0;
             transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
-        /* 【20.7.1 独立界域·向内金丝法则（与罗盘玉石核心融为一体）】 */
-        #ling-time-dot.state-day    { --ling-inset-border-color: rgba(44, 53, 62, 0.25); --ling-jade-bg-color: #f4f3f0; }   /* 白昼：内敛乌金丝+羊脂玉 */
-        #ling-time-dot.state-night  { --ling-inset-border-color: rgba(197, 160, 89, 0.3); --ling-jade-bg-color: #1a1a20; } /* 黑夜：玄铁暗金丝+墨晶玉 */
-        #ling-time-dot.state-sunset { --ling-inset-border-color: rgba(255, 78, 80, 0.45); --ling-jade-bg-color: #331111; }  /* 夕照：落日熔金丝+琥珀玉 */
-        #ling-time-dot.state-sky    { --ling-inset-border-color: rgba(6, 182, 212, 0.45); --ling-jade-bg-color: #111a33; }     /* 破晓：寒冰极光丝+冰晶玉 */
+        /* 【20.7.2 独立界域·常态天道描边法则 (影响金丝与级联斜面晕染)】 */
+        #ling-time-dot.state-day    { --ling-inset-border-color: rgba(44, 53, 62, 0.2); --ling-jade-bg-color: #f4f3f0; }   
+        #ling-time-dot.state-night  { --ling-inset-border-color: rgba(197, 160, 89, 0.25); --ling-jade-bg-color: #1a1a20; } 
+        #ling-time-dot.state-sunset { --ling-inset-border-color: rgba(255, 78, 80, 0.35); --ling-jade-bg-color: #331111; }  
+        #ling-time-dot.state-sky    { --ling-inset-border-color: rgba(6, 182, 212, 0.35); --ling-jade-bg-color: #111a33; }     
 
-        /* [小圆内部·四象法相底色图层] —— 用于呼吸潮汐 */
+        /* [小圆内部·四象法相底色图层] */
         .ling-aura-layer {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            border-radius: 50%;
-            opacity: 0; 
-            z-index: 1;
-            background-size: 160% 160%, 100% 100%;
-            transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1); 
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0; border-radius: 50%; opacity: 0; z-index: 1;
+            background-size: 160% 160%, 100% 100%; transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1); 
         }
-
-        .aura-day {
-            background-image: radial-gradient(circle at var(--ling-light-x) var(--ling-light-y), rgba(138, 180, 248, 0.7) 0%, transparent 60%);
-        }
-        .aura-night {
-            background-image: radial-gradient(circle at var(--ling-light-x) var(--ling-light-y), rgba(139, 92, 246, 0.7) 0%, transparent 60%);
-        }
+        .aura-day    { background-image: radial-gradient(circle at var(--ling-light-x) var(--ling-light-y), rgba(138, 180, 248, 0.6) 0%, transparent 60%); }
+        .aura-night  { background-image: radial-gradient(circle at var(--ling-light-x) var(--ling-light-y), rgba(139, 92, 246, 0.6) 0%, transparent 60%); }
         .aura-sunset { background-image: radial-gradient(circle at var(--ling-light-x) var(--ling-light-y), #ff4e50 0%, #f97316 60%, transparent 100%); }
-        .aura-sky { background-image: radial-gradient(circle at var(--ling-light-x) var(--ling-light-y), #06b6d4 0%, #3b82f6 60%, transparent 100%); }
+        .aura-sky    { background-image: radial-gradient(circle at var(--ling-light-x) var(--ling-light-y), #06b6d4 0%, #3b82f6 60%, transparent 100%); }
 
         .ling-aura-layer.active { opacity: 1; }
 
-        /* 3. 【拟物化重塑：天道古法真言层】—— 核心内圆里的绝对正向悬浮压铸雕刻 */
+        /* 3. 古法真言层 (压铸浮雕悬浮雕刻) */
         #ling-time-text {
-            position: relative;
-            z-index: 10; 
+            position: relative; z-index: 10; 
             font-family: "ShuowenZuan", "LiSu", "KaiTi", serif; 
-            font-size: 14px; /* 纳芥袖珍字号 */
-            font-weight: 700;
-            text-align: center;
-            line-height: 36px; /* 罗盘内部核心圆的高 */
-            width: 100%; height: 100%;
-            display: flex; align-items: center; justify-content: center;
-            
-            /* 篡体字形特殊微调 */
-            padding-top: 1px; 
-            box-sizing: border-box;
-            
-            /* 【20.7.1 核心：绝对拟物悬浮压铸浮雕式阴影】 */
+            font-size: 13px; /* 从 14px 袖珍进一步收敛，强化罗盘下沉浮雕质感 */
+            font-weight: 700; text-align: center;
+            line-height: 32px; /* 罗盘内部下沉核心圆的高 */
+            width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+            padding-top: 1px; box-sizing: border-box;
             transition: color 0.2s ease-in-out, text-shadow 0.2s ease-in-out, -webkit-text-stroke 0.2s ease-in-out;
         }
 
-        /* 不同界域下真言文字的基础浮雕调色法则 */
-        .text-day-style { color: #2c353e; text-shadow: 0px 1px 1px rgba(255, 255, 255, 0.7); -webkit-text-stroke: 0px transparent; }
-        .text-night-style { color: #e2e8f0; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6); -webkit-text-stroke: 0px transparent; }
-        .text-sunset-style { color: #ffffff; text-shadow: 1px 1px 2px rgba(255, 0, 0, 0.8); -webkit-text-stroke: 0px transparent; }
-        .text-sky-style { color: #ffffff; text-shadow: 1px 1px 2px rgba(0, 136, 255, 0.8); -webkit-text-stroke: 0px transparent; }
+        .text-day-style    { color: #2c353e; text-shadow: 0px 1px 1px rgba(255, 255, 255, 0.7); }
+        .text-night-style  { color: #e2e8f0; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6); }
+        .text-sunset-style { color: #ffffff; text-shadow: 1px 1px 2px rgba(255, 0, 0, 0.8); }
+        .text-sky-style    { color: #ffffff; text-shadow: 1px 1px 2px rgba(0, 136, 255, 0.8); }
 
         /* 4. 悬浮激活态 */
-        #ling-time-dot:hover { transform: scale(1.12); opacity: 1 !important; /* 强制唤醒半隐态 */ }
+        #ling-time-dot:hover { transform: scale(1.12); opacity: 1 !important; }
         #ling-time-dot:hover .ling-aura-layer { animation-play-state: paused !important; }
-        
-        /* 拟物版 Hover 星轨自转共鸣错位 */
         #ling-time-dot:hover::before { border: 1px dashed rgba(197, 160, 89, 0.6); transform: rotate(180deg); }
         
-        /* 【20.7.1 新规】白昼 Hover 罗盘真言神识显化 */
+        /* [20.7.2 描边进化：外壳在 Hover 时，内部级联斜面的暈染颜色也跟随高亮] */
+        #ling-time-dot.state-day:hover    { --ling-inset-border-color: rgba(0, 0, 0, 0.7); }
+        #ling-time-dot.state-night:hover  { --ling-inset-border-color: rgba(197, 160, 89, 0.75); }
+        #ling-time-dot.state-sunset:hover { --ling-inset-border-color: rgba(255, 78, 80, 0.85); }
+        #ling-time-dot.state-sky:hover    { --ling-inset-border-color: rgba(6, 182, 212, 0.85); }
+
         #ling-time-dot.state-day:hover #ling-time-text {
             color: #000000 !important; font-weight: 900 !important; -webkit-text-stroke: 0.5px #000000; 
-            text-shadow: 0px 1px 2px rgba(255, 255, 255, 0.9), 0px 2px 4px rgba(0,0,0,0.15);
+            text-shadow: 0px 1px 2px rgba(255, 255, 255, 0.9), 0px 2px 4px rgba(0,0,0,0.1);
         }
         #ling-time-dot.state-night:hover #ling-time-text {
             color: #050508 !important; font-weight: 900 !important; -webkit-text-stroke: 0.7px #c5a059; 
-            text-shadow: 0 0 5px rgba(139, 92, 246, 0.9), 0px 2px 4px rgba(29, 78, 216, 0.4);
+            text-shadow: 0 0 5px rgba(139, 92, 246, 0.8), 0px 2px 4px rgba(29, 78, 216, 0.3);
         }
         #ling-time-dot.state-sunset:hover #ling-time-text {
             color: #4a0000 !important; font-weight: 900 !important; -webkit-text-stroke: 0.5px #4a0000;
-            text-shadow: 0 0 6px rgba(255, 78, 80, 0.8), 0px 2px 4px rgba(255,0,0,0.15);
+            text-shadow: 0 0 6px rgba(255, 78, 80, 0.8), 0px 2px 4px rgba(255,0,0,0.1);
         }
         #ling-time-dot.state-sky:hover #ling-time-text {
             color: #001133 !important; font-weight: 900 !important; -webkit-text-stroke: 0.5px #001133;
-            text-shadow: 0 0 6px rgba(6, 182, 212, 0.9), 0px 2px 4px rgba(0, 136, 255, 0.15);
+            text-shadow: 0 0 6px rgba(6, 182, 212, 0.9), 0px 2px 4px rgba(0, 136, 255, 0.1);
         }
 
         #ling-time-dot:active { transform: scale(0.95); }
 
-        /* 星轨自转动画控制，作用于复合架构 */
+        /* 星轨自转动画控制 */
         .run-rotate-day::before { animation: starRotateClockwise 25s linear infinite; }
         .run-rotate-night::before { animation: starRotateClockwise 30s linear infinite; }
         .run-rotate-night::after { border: 1px dashed rgba(255, 255, 255, 0.05); opacity: 0.5; animation: starRotateCounter 40s linear infinite; }
 
+        /* 时辰突变震荡 */
         .ling-pulse-trigger { animation: lingShock 0.45s cubic-bezier(0.25, 1, 0.5, 1) !important; }
         @keyframes lingShock {
             0% { transform: scale(1); }
-            30% { transform: scale(1.15); box-shadow: 0 0 35px rgba(255,255,255,0.6); }
+            30% { transform: scale(1.15); box-shadow: 0 0 35px rgba(255,255,255,0.5); }
             100% { transform: scale(1); }
         }
 
@@ -224,8 +205,8 @@
 
         @media screen and (max-width: 768px) {
             #ling-time-dot { width: 40px; height: 40px; }
-            #ling-time-text { font-size: 13px; line-height: 32px; }
-            #ling-jade-core { top: 3.5px; left: 3.5px; right: 3.5px; bottom: 3.5px; }
+            #ling-time-text { font-size: 12px; line-height: 28px; }
+            #ling-jade-core { top: 5.5px; left: 5.5px; right: 5.5px; bottom: 5.5px; }
         }
     `;
 
@@ -233,11 +214,11 @@
     styleNode.textContent = STYLES;
     document.head.appendChild(styleNode);
 
-    // ================= 2. 创建拟物复合 DOM 架构 (天道罗盘) =================
+    // ================= 2. 创建拟物复合 DOM 架构 =================
     const dot = document.createElement('div');
     dot.id = 'ling-time-dot';
 
-    // 创建核心小圆：灵玉核心
+    // 创建下沉核心小圆：灵玉核心
     const jadeCore = document.createElement('div');
     jadeCore.id = 'ling-jade-core';
 
@@ -250,7 +231,7 @@
     };
     Object.values(auraLayers).forEach(layer => jadeCore.appendChild(layer));
 
-    // 创建独立的正向压铸真言文字层 (在灵玉核心内部悬浮)
+    // 创建独立的正向压铸真言文字层
     const textLayer = document.createElement('div');
     textLayer.id = 'ling-time-text';
     textLayer.textContent = '---';
@@ -267,7 +248,7 @@
         return layer;
     }
 
-    // ================= 3. 神识随行：鼠标坐标联动算法 (融入拟物重感) =================
+    // ================= 3. 神识随行：鼠标坐标联动算法 =================
     document.addEventListener('mousemove', (e) => {
         if (isDragging) return; 
         
@@ -282,13 +263,13 @@
         if (distance < 250) {
             const influence = (250 - distance) / 250; 
             
-            // 拟物版避光排斥：光核反向藏得更深，外部阴影拉得更远且重
+            // 拟物罗盘排斥：光源反向藏得更深，外部阴影拉得更远
             const lightX = 45 - (deltaX / distance) * 14 * influence;
             const lightY = 45 - (deltaY / distance) * 14 * influence;
             
             const shadowX = (deltaX / distance) * 16 * influence;
             const shadowY = 10 + (deltaY / distance) * 16 * influence;
-            const shadowBlur = 30 + influence * 20;
+            const shadowBlur = 30 + influence * 15;
 
             dot.style.setProperty('--ling-light-x', `${lightX}%`);
             dot.style.setProperty('--ling-light-y', `${lightY}%`);
@@ -310,14 +291,14 @@
         clearTimeout(fadeTimer);
         dot.style.opacity = '1'; 
         fadeTimer = setTimeout(() => {
-            if (!isDragging) dot.style.opacity = '0.35'; // 3秒无交互进入静谧隐没态，略微调高一点拟物版半隐透明度
+            if (!isDragging) dot.style.opacity = '0.35'; 
         }, 3000);
     }
     
     dot.addEventListener('mouseenter', resetFadeTimer);
     dot.addEventListener('mousemove', resetFadeTimer);
 
-    // ================= 5. 核心时辰监听与四象法相消融逻辑 =================
+    // ================= 5. 核心时辰监听逻辑 =================
     let lastKey = ""; 
 
     function triggerShockwave() {
@@ -354,15 +335,11 @@
                 else auraLayers[key].classList.remove('active');
             });
             
-            // 更新罗盘外壳界域状态（决定hover时真言反差色）与星轨动画
             dot.className = shellState;
             dot.classList.remove('run-rotate-day', 'run-rotate-night');
             if (currentKey === 'day') dot.classList.add('run-rotate-day');
             if (currentKey === 'night') dot.classList.add('run-rotate-night');
-            
-            // 更替真言浮雕色调
             textLayer.className = textStyle;
-            
             if (lastKey !== "") triggerShockwave();
             lastKey = currentKey;
         }
@@ -406,7 +383,7 @@
         finalLeft = Math.max(0, Math.min(winWidth - dotWidth, finalLeft));
         finalTop = Math.max(0, Math.min(winHeight - dotHeight, finalTop));
 
-        // 拟物罗盘的智能吸附缓动
+        // 磁吸时的拟物缓动
         dot.style.transition = 'box-shadow 0.25s cubic-bezier(0.25, 1, 0.5, 1), left 0.4s cubic-bezier(0.25, 1, 0.5, 1), top 0.4s cubic-bezier(0.25, 1, 0.5, 1), transform 0.2s, opacity 0.6s';
         dot.style.left = finalLeft + 'px';
         dot.style.top = finalTop + 'px';
