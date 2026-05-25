@@ -6,8 +6,8 @@
 // @match        https://ling.muge.info/game.html
 // @match        http://ling.muge.info/game.html
 // -- 关键两行：强行锁定天道更新因果线 --
-// @updateURL    https://raw.githubusercontent.com/xiaolanglu/Spiritual-script/raw/refs/heads/main/ling-time-dot.user.js
-// @downloadURL  https://raw.githubusercontent.com/xiaolanglu/Spiritual-script/raw/refs/heads/main/ling-time-dot.user.js
+// @updateURL    https://github.com/xiaolanglu/Spiritual-script/raw/refs/heads/main/ling-time-dot.user.js
+// @downloadURL  https://github.com/xiaolanglu/Spiritual-script/raw/refs/heads/main/ling-time-dot.user.js
 // ==/UserScript==
 
 (function() {
