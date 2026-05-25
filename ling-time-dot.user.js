@@ -1,13 +1,14 @@
 // ==UserScript==
 // @name         灵界时辰天道液态玻璃珠
 // @namespace    http://tampermonkey.net/
-// @version      20.6.9
+// @version      20.7.0
+// @description  交互视觉终极版。重构绝对向内微雕描边（True Inset Border），引入高透冰晶折射层，彻底消除外溢锯齿，使袖珍体态更具法宝灵性。
 // @author       修仙道友
 // @match        https://ling.muge.info/game.html
 // @match        http://ling.muge.info/game.html
-// -- 关键两行：强行锁定天道更新因果线 --
-// @updateURL    https://github.com/xiaolanglu/Spiritual-script/raw/refs/heads/main/ling-time-dot.user.js
-// @downloadURL  https://github.com/xiaolanglu/Spiritual-script/raw/refs/heads/main/ling-time-dot.user.js
+// @icon         https://ling.muge.info/favicon.svg
+// @grant        none
+// @run-at       document-end
 // ==/UserScript==
 
 (function() {
@@ -30,7 +31,7 @@
     fontStyleNode.textContent = AMBIENT_FONT;
     document.head.appendChild(fontStyleNode);
 
-    // ================= 1. 殿堂级天道美化 CSS (重工业级双层描边重构) =================
+    // ================= 1. 殿堂级天道美化 CSS (绝对向内描边重构) =================
     const STYLES = `
         :root {
             --ling-light-x: 45%;
@@ -38,6 +39,9 @@
             --ling-shadow-x: 0px;
             --ling-shadow-y: 10px;
             --ling-shadow-blur: 30px;
+            
+            /* 【20.7.0 独创】天道向内流色描边变量，由各时辰独立继承 */
+            --ling-inset-border-color: rgba(255, 255, 255, 0.4);
         }
 
         /* 1. 法宝外壳及主容器 */
@@ -55,33 +59,41 @@
             align-items: center;
             justify-content: center;
             box-sizing: border-box;
-            overflow: hidden; 
+            overflow: hidden; /* 锁死一切向内的光效 */
             
             backdrop-filter: blur(12px) saturate(210%);
             -webkit-backdrop-filter: blur(12px) saturate(210%);
             
-            /* 【20.6.9 描边进化】引入内层 1px 晶体折射描边 (inset 0 0 0 1px) */
+            /* 【20.7.0 重磅：废除外部 Border，全部转化为 3D Inset 复合向内描边】 */
             box-shadow: 
                 var(--ling-shadow-x) var(--ling-shadow-y) var(--ling-shadow-blur) rgba(0, 0, 0, 0.45),                    
-                inset 5px 5px 10px rgba(255, 255, 255, 0.6),       
+                inset 4px 4px 8px rgba(255, 255, 255, 0.6),       
                 inset -4px -4px 8px rgba(0, 0, 0, 0.45),            
                 inset 0 0 12px rgba(255, 255, 255, 0.2),
-                inset 0 0 0 1px rgba(255, 255, 255, 0.35); /* 核心：内层冰晶护罩 */
                 
-            /* 基础外层描边，默认给予高透白，后续由四象状态动态覆盖 */
-            border: 1px solid rgba(255, 255, 255, 0.45);
+                /* 以下两行为核心向内微雕描边：第一层为时辰流色，第二层为冰晶高光折射 */
+                inset 0 0 0 1px var(--ling-inset-border-color),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.25); 
+                
+            /* 废除外部粗糙描边，改为高精度裁切线 */
+            border: none; 
             
-            transition: border-color 0.8s cubic-bezier(0.25, 1, 0.5, 1),
-                        box-shadow 0.2s cubic-bezier(0.25, 1, 0.5, 1),
+            transition: box-shadow 0.3s cubic-bezier(0.25, 1, 0.5, 1),
                         opacity 0.6s cubic-bezier(0.25, 1, 0.5, 1),
                         transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        /* 【20.6.9 独立界域外层描边法则：让边缘轮廓与天地灵气融为一体】 */
-        #ling-time-dot.state-day { border-color: rgba(44, 53, 62, 0.25); }   /* 白昼：内敛乌金丝 */
-        #ling-time-dot.state-night { border-color: rgba(197, 160, 89, 0.35); } /* 黑夜：玄铁暗金丝 */
-        #ling-time-dot.state-sunset { border-color: rgba(255, 78, 80, 0.5); }  /* 夕照：落日熔金丝 */
-        #ling-time-dot.state-sky { border-color: rgba(6, 182, 212, 0.5); }     /* 破晓：寒冰极光丝 */
+        /* 【20.7.0 独立界域·常态向内金丝法则】 */
+        #ling-time-dot.state-day    { --ling-inset-border-color: rgba(44, 53, 62, 0.25); }   /* 白昼：内敛乌金 */
+        #ling-time-dot.state-night  { --ling-inset-border-color: rgba(197, 160, 89, 0.35); } /* 黑夜：玄铁暗金 */
+        #ling-time-dot.state-sunset { --ling-inset-border-color: rgba(255, 78, 80, 0.5); }  /* 夕照：落日熔金 */
+        #ling-time-dot.state-sky    { --ling-inset-border-color: rgba(6, 182, 212, 0.5); }     /* 破晓：寒冰极光 */
+
+        /* 【20.7.0 独立界域·Hover觉醒向内高亮法则】 */
+        #ling-time-dot.state-day:hover    { --ling-inset-border-color: rgba(0, 0, 0, 0.8); }
+        #ling-time-dot.state-night:hover  { --ling-inset-border-color: rgba(197, 160, 89, 0.85); }
+        #ling-time-dot.state-sunset:hover { --ling-inset-border-color: rgba(255, 78, 80, 0.9); }
+        #ling-time-dot.state-sky:hover    { --ling-inset-border-color: rgba(6, 182, 212, 0.9); }
 
         /* 2. 四象法相独立底色图层 */
         .ling-aura-layer {
@@ -132,14 +144,8 @@
         .text-sunset-style { color: #ffffff; text-shadow: 0 1px 3px rgba(255, 0, 0, 0.7); }
         .text-sky-style { color: #ffffff; text-shadow: 0 1px 3px rgba(0, 136, 255, 0.8); }
 
-        /* 4. 悬浮激活态（全显、放大、外部星轨扩张、描边高亮觉醒） */
+        /* 4. 悬浮激活态 */
         #ling-time-dot:hover { transform: scale(1.12); opacity: 1 !important; }
-
-        /* 【20.6.9 描边进化】Hover 状态下，外层金丝描边瞬间觉醒高亮，法宝质感暴增 */
-        #ling-time-dot.state-day:hover { border-color: rgba(0, 0, 0, 0.85); }
-        #ling-time-dot.state-night:hover { border-color: rgba(197, 160, 89, 0.85); }
-        #ling-time-dot.state-sunset:hover { border-color: rgba(255, 78, 80, 0.9); }
-        #ling-time-dot.state-sky:hover { border-color: rgba(6, 182, 212, 0.9); }
 
         #ling-time-dot.state-day:hover #ling-time-text {
             font-size: 15px; color: #000000 !important; font-weight: 900 !important; -webkit-text-stroke: 0.5px #000000; 
@@ -356,7 +362,8 @@
         finalLeft = Math.max(0, Math.min(winWidth - dotWidth, finalLeft));
         finalTop = Math.max(0, Math.min(winHeight - dotHeight, finalTop));
 
-        dot.style.transition = 'border-color 0.8s, left 0.4s cubic-bezier(0.25, 1, 0.5, 1), top 0.4s cubic-bezier(0.25, 1, 0.5, 1), transform 0.2s, opacity 0.6s';
+        // 磁吸时的缓动控制
+        dot.style.transition = 'left 0.4s cubic-bezier(0.25, 1, 0.5, 1), top 0.4s cubic-bezier(0.25, 1, 0.5, 1), transform 0.2s, opacity 0.6s';
         dot.style.left = finalLeft + 'px';
         dot.style.top = finalTop + 'px';
 
