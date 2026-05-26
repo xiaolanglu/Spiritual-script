@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         灵界时辰天道罗盘
 // @namespace    http://tampermonkey.net/
-// @version      20.8.3
-// @description  拟物交互视觉流体玉莹大成版。已抹除title属性的文本提示功能，保持天道纯净。
+// @version      20.8.4
+// @description  拟物交互视觉流体玉莹大成版。重铸夜间流体为正统冷冽的“寒潭玄青与幽冥墨蓝”色轨，更契合深邃修仙夜景。
 // @author       修仙道友
 // @match        https://ling.muge.info/game.html
 // @match        http://ling.muge.info/game.html
@@ -33,7 +33,7 @@
     fontStyleNode.textContent = AMBIENT_FONT;
     document.head.appendChild(fontStyleNode);
 
-    // ================= 1. 流体玉莹 CSS 大阵 =================
+    // ================= 1. 流体玉莹 CSS 大阵 (全量注入玄青夜色) =================
     const STYLES = `
         :root {
             /* 交互联动变量群 */
@@ -138,7 +138,7 @@
         }
         .ling-pet-compass__fluid-container.active { opacity: 1; }
 
-        /* 主流体层：顺时针非线性揉杂涡流 */
+        /* 主流体层 */
         .ling-pet-compass__fluid-prime {
             position: absolute; top: 0; left: 0; right: 0; bottom: 0; border-radius: 50%;
             background-image: var(--fluid-prime-color);
@@ -148,7 +148,7 @@
             animation: lingVortexPrime 11s cubic-bezier(0.37, 0, 0.63, 1) infinite;
         }
 
-        /* 次流体层：逆时针对冲拉伸撕裂涡流 */
+        /* 次流体层 */
         .ling-pet-compass__fluid-sub {
             position: absolute; top: 5%; left: 5%; right: 5%; bottom: 5%; border-radius: 50%;
             background-image: var(--fluid-sub-color);
@@ -157,7 +157,7 @@
             animation: lingVortexSub 7s cubic-bezier(0.45, 0, 0.55, 1) infinite;
         }
 
-        /* 3. __text 真言信息层（初始化：浮空透视） */
+        /* 3. __text 真言信息层 */
         .ling-pet-compass__text {
             position: relative; z-index: 10; font-family: "ShuowenZuan", "LiSu", "KaiTi", serif; 
             font-size: 13px; font-weight: 700; text-align: center; line-height: 32px; width: 100%; height: 100%; 
@@ -169,7 +169,9 @@
                         transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
-        /* DATA-STATE 状态机·四象流体基础态悬浮阴影 */
+        /* ==================== DATA-STATE 状态机 · 时辰四象 ==================== */
+        
+        /* [白昼：日耀玉白] */
         .ling-pet-compass[data-state="day"] { 
             --ling-inset-border-color: rgba(44, 53, 62, 0.2); --ling-jade-bg-color: #f5f4f0; --ling-jade-glint: rgba(255, 255, 255, 0.8); 
             --ling-stream-bg: linear-gradient(90deg, #eae8e3, #fcfbf9, #cbd5e1, #eae8e3);
@@ -178,14 +180,21 @@
         }
         .ling-pet-compass[data-state="day"] .ling-pet-compass__text { color: #232a30; text-shadow: 0px 1px 2px rgba(0,0,0,0.18), 0.5px 0.5px 0.5px rgba(255,255,255,0.9); }
 
+        /* 🌌 [重铸夜间：寒潭玄青与幽冥墨蓝] */
         .ling-pet-compass[data-state="night"] { 
-            --ling-inset-border-color: rgba(197, 160, 89, 0.25); --ling-jade-bg-color: #14161a; --ling-jade-glint: rgba(255, 255, 255, 0.15); 
-            --ling-stream-bg: linear-gradient(90deg, #14161a, #231b3c, #524227, #14161a);
-            --fluid-prime-color: radial-gradient(circle at var(--ling-light-x) var(--ling-light-y), rgba(139, 92, 246, 0.7) 0%, rgba(197, 160, 89, 0.25) 45%, transparent 70%);
-            --fluid-sub-color: radial-gradient(circle at 40% 70%, rgba(139, 91, 186, 0.5) 0%, transparent 65%);
+            --ling-inset-border-color: rgba(56, 189, 248, 0.18); /* 冷冽微弱的月华边界线 */
+            --ling-jade-bg-color: #0b0f17;                       /* 极黑的寒潭玄青底色 */
+            --ling-jade-glint: rgba(255, 255, 255, 0.12); 
+            --ling-stream-bg: linear-gradient(90deg, #090d14, #0f172a, #1e293b, #090d14); /* 墨蓝到玄青的外环过渡 */
+            /* 主流体：玄青裹挟一抹冷月华蓝 */
+            --fluid-prime-color: radial-gradient(circle at var(--ling-light-x) var(--ling-light-y), rgba(56, 189, 248, 0.75) 0%, rgba(30, 41, 59, 0.5) 45%, transparent 75%);
+            /* 次流体：寂灭幽夜蓝漩涡对冲 */
+            --fluid-sub-color: radial-gradient(circle at 40% 70%, rgba(15, 23, 42, 0.95) 0%, transparent 65%);
         }
-        .ling-pet-compass[data-state="night"] .ling-pet-compass__text { color: #cbd5e1; text-shadow: 0px 1px 3px rgba(0,0,0,0.55), 0.5px 0.5px 0.5px rgba(255,255,255,0.15); }
+        /* 寂灭之夜下的清冷月白真言 */
+        .ling-pet-compass[data-state="night"] .ling-pet-compass__text { color: #f1f5f9; text-shadow: 0px 1px 3px rgba(0,0,0,0.95), 0px 0px 3px rgba(56,189,248,0.2); }
 
+        /* [黄昏：夕照熔金] */
         .ling-pet-compass[data-state="sunset"] { 
             --ling-inset-border-color: rgba(255, 78, 80, 0.35);  --ling-jade-bg-color: #2b1212; --ling-jade-glint: rgba(255, 120, 120, 0.3); 
             --ling-stream-bg: linear-gradient(90deg, #2b1212, #ff4e50, #f97316, #2b1212);
@@ -194,6 +203,7 @@
         }
         .ling-pet-compass[data-state="sunset"] .ling-pet-compass__text { color: #ffe4e6; text-shadow: 0px 1px 3px rgba(0,0,0,0.65), 0.5px 0.5px 0.5px rgba(255,78,80,0.3); }
 
+        /* [破晓：天青苍穹] */
         .ling-pet-compass[data-state="sky"] { 
             --ling-inset-border-color: rgba(6, 182, 212, 0.35);  --ling-jade-bg-color: #0f1826; --ling-jade-glint: rgba(100, 220, 255, 0.4); 
             --ling-stream-bg: linear-gradient(90deg, #0f1826, #06b6d4, #1d4ed8, #0f1826);
@@ -202,7 +212,7 @@
         }
         .ling-pet-compass[data-state="sky"] .ling-pet-compass__text { color: #ecfeff; text-shadow: 0px 1px 3px rgba(0,0,0,0.6), 0.5px 0.5px 0.5px rgba(6,182,212,0.3); }
 
-        /* 交互态控制 */
+        /* ==================== ⚡ 交互状态响应 ==================== */
         .ling-pet-compass:hover { transform: translateX(0) scale(1.12) !important; opacity: 1 !important; --ling-shadow-y: 15px !important; --ling-shadow-blur: 32px !important; --ling-shadow-opacity: 0.55 !important; }
         .ling-pet-compass:hover .ling-pet-compass__aura { opacity: 0.85; }
         
@@ -210,13 +220,14 @@
         .ling-pet-compass:hover .ling-pet-compass__text { transform: translateY(0.5px) scale(0.98); }
 
         .ling-pet-compass[data-state="day"]:hover    { --ling-inset-border-color: rgba(0, 0, 0, 0.65); }
-        .ling-pet-compass[data-state="night"]:hover  { --ling-inset-border-color: rgba(197, 160, 89, 0.7); }
+        .ling-pet-compass[data-state="night"]:hover  { --ling-inset-border-color: rgba(56, 189, 248, 0.7); } /* 悬停强化月华边 */
         .ling-pet-compass[data-state="sunset"]:hover { --ling-inset-border-color: rgba(255, 78, 80, 0.8); }
         .ling-pet-compass[data-state="sky"]:hover    { --ling-inset-border-color: rgba(6, 182, 212, 0.8); }
 
         /* 悬停四象深度沉降投影 */
         .ling-pet-compass[data-state="day"]:hover .ling-pet-compass__text { color: #000000 !important; font-weight: 900 !important; text-shadow: 0px 0.5px 1px rgba(0, 0, 0, 0.65), 0px 0px 4px rgba(147, 197, 253, 0.8); }
-        .ling-pet-compass[data-state="night"]:hover .ling-pet-compass__text { color: #111317 !important; font-weight: 900 !important; -webkit-text-stroke: 0.5px #c5a059; text-shadow: 0px 0.5px 1.5px rgba(0, 0, 0, 0.95), 0px 0px 6px rgba(167, 139, 250, 0.9); }
+        /* 🌌 玄青夜色悬停爆起：月华淡银镶边，冷翠高光 */
+        .ling-pet-compass[data-state="night"]:hover .ling-pet-compass__text { color: #090d16 !important; font-weight: 900 !important; -webkit-text-stroke: 0.5px #e2e8f0; text-shadow: 0px 0.5px 1.5px rgba(0, 0, 0, 0.98), 0px 0px 6px rgba(56, 189, 248, 0.95); }
         .ling-pet-compass[data-state="sunset"]:hover .ling-pet-compass__text { color: #2b0000 !important; font-weight: 900 !important; -webkit-text-stroke: 0.5px #ff4e50; text-shadow: 0px 0.5px 1.5px rgba(0, 0, 0, 0.95), 0px 0px 6px rgba(249, 115, 22, 0.95); }
         .ling-pet-compass[data-state="sky"]:hover .ling-pet-compass__text { color: #000c1f !important; font-weight: 900 !important; -webkit-text-stroke: 0.5px #06b6d4; text-shadow: 0px 0.5px 1.5px rgba(0, 0, 0, 0.95), 0px 0px 6px rgba(34, 211, 238, 0.95); }
 
@@ -443,7 +454,6 @@
                 else fluidContainers[key].classList.remove('active');
             });
             
-            // 🌟 核心修改点：已彻底隐去 title 的悬停显示功能
             dot.setAttribute('data-state', currentState);
             
             if (lastState !== "") triggerShockwave();
