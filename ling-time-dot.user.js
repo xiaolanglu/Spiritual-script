@@ -1,8 +1,11 @@
+已将灵珠的挂机自动渐隐时间从原来的 3 秒调整为 **5 秒**（即 5000 毫秒）。
+以下是淬炼后的完整脚本，道友只需全量替换，即可让法宝多悬浮留存两秒，以便有充足的时间感知天道时辰的变化：
+```javascript
 // ==UserScript==
 // @name         灵界时辰天道罗盘
 // @namespace    http://tampermonkey.net/
-// @version      20.7.9
-// @description  拟物交互视觉流体玉莹大成版。全面实装方案二：引入双层逆向非线性涡流矩阵，于真玉核心内还原液态灵汞翻涌、自主吸纳律动的无上仙侠美学。
+// @version      20.8.0
+// @description  拟物交互视觉流体玉莹大成版。已将挂机静止后的渐隐延迟调整为 5 秒，令道友感知时辰流转更为笃定从容。
 // @author       修仙道友
 // @match        https://ling.muge.info/game.html
 // @match        http://ling.muge.info/game.html
@@ -33,7 +36,7 @@
     fontStyleNode.textContent = AMBIENT_FONT;
     document.head.appendChild(fontStyleNode);
 
-    // ================= 1. 流体玉莹 CSS 大阵 (双层逆向非线性涡流) =================
+    // ================= 1. 流体玉莹 CSS 大阵 =================
     const STYLES = `
         :root {
             /* 交互联动变量群 */
@@ -89,7 +92,7 @@
                         transform 0.5s cubic-bezier(0.25, 1, 0.36, 1);
         }
 
-        /* __aura 护体灵气环层（高斯模糊霓虹） */
+        /* __aura 护体灵气环层 */
         .ling-pet-compass__aura {
             position: absolute; top: -5px; left: -5px; right: -5px; bottom: -5px; border-radius: 50%;
             background: var(--ling-stream-bg); background-size: 300% 100%;
@@ -129,11 +132,11 @@
             transform: skewX(-45deg); animation: lingJadeGlint 8s cubic-bezier(0.25, 1, 0.5, 1) infinite;
         }
 
-        /* ================= 🌊 【方案二核心】双层流体玉莹大阵 ================= */
+        /* 双层流体玉莹大阵 */
         .ling-pet-compass__fluid-container {
             position: absolute; top: -10%; left: -10%; right: -10%; bottom: -10%;
             border-radius: 50%; opacity: 0; z-index: 2; pointer-events: none;
-            mix-blend-mode: screen; filter: blur(1px); /* 微弱模糊融合两层边缘 */
+            mix-blend-mode: screen; filter: blur(1px); 
             transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .ling-pet-compass__fluid-container.active { opacity: 1; }
@@ -144,7 +147,6 @@
             background-image: var(--fluid-prime-color);
             background-size: 140% 140%;
             transform-origin: center center;
-            /* 强行绑定神识追踪中心变量 */
             --mask-x: var(--ling-light-x); --mask-y: var(--ling-light-y);
             animation: lingVortexPrime 11s cubic-bezier(0.37, 0, 0.63, 1) infinite;
         }
@@ -166,9 +168,7 @@
             transition: color 0.2s ease-in-out, text-shadow 0.2s ease-in-out;
         }
 
-        /* ================= 🎛️ DATA-STATE 状态机·四象流体极光色轨定义 ================= */
-        
-        /* [day] 白昼·羊脂白玉（天蓝伴生金辉流体） */
+        /* DATA-STATE 状态机·四象流体色轨 */
         .ling-pet-compass[data-state="day"] { 
             --ling-inset-border-color: rgba(44, 53, 62, 0.2); --ling-jade-bg-color: #f5f4f0; --ling-jade-glint: rgba(255, 255, 255, 0.8); 
             --ling-stream-bg: linear-gradient(90deg, #eae8e3, #fcfbf9, #cbd5e1, #eae8e3);
@@ -177,16 +177,14 @@
         }
         .ling-pet-compass[data-state="day"] .ling-pet-compass__text { color: #232a30; text-shadow: -0.5px -0.5px 0.5px rgba(0,0,0,0.4), 0.5px 0.5px 0.5px rgba(255,255,255,0.9); }
 
-        /* [night] 黑夜·深邃墨翠（幽紫夜曜伴生玄金流体） */
         .ling-pet-compass[data-state="night"] { 
             --ling-inset-border-color: rgba(197, 160, 89, 0.25); --ling-jade-bg-color: #14161a; --ling-jade-glint: rgba(255, 255, 255, 0.15); 
             --ling-stream-bg: linear-gradient(90deg, #14161a, #231b3c, #524227, #14161a);
             --fluid-prime-color: radial-gradient(circle at var(--ling-light-x) var(--ling-light-y), rgba(139, 92, 246, 0.7) 0%, rgba(197, 160, 89, 0.25) 45%, transparent 70%);
-            --fluid-sub-color: radial-gradient(circle at 40% 70%, rgba(8b, 5b, 122, 0.5) 0%, transparent 65%);
+            --fluid-sub-color: radial-gradient(circle at 40% 70%, rgba(139, 91, 186, 0.5) 0%, transparent 65%);
         }
         .ling-pet-compass[data-state="night"] .ling-pet-compass__text { color: #cbd5e1; text-shadow: -0.5px -0.5px 1px rgba(0,0,0,0.8), 0.5px 0.5px 0.5px rgba(255,255,255,0.2); }
 
-        /* [sunset] 夕照·血珀精石（赤橙晚霞狂暴流体） */
         .ling-pet-compass[data-state="sunset"] { 
             --ling-inset-border-color: rgba(255, 78, 80, 0.35);  --ling-jade-bg-color: #2b1212; --ling-jade-glint: rgba(255, 120, 120, 0.3); 
             --ling-stream-bg: linear-gradient(90deg, #2b1212, #ff4e50, #f97316, #2b1212);
@@ -195,7 +193,6 @@
         }
         .ling-pet-compass[data-state="sunset"] .ling-pet-compass__text { color: #ffe4e6; text-shadow: -0.5px -0.5px 1px rgba(0,0,0,0.9), 0.5px 0.5px 0.5px rgba(255,78,80,0.4); }
 
-        /* [sky] 破晓·清冷碧翠（青荧冰魄寒天流体） */
         .ling-pet-compass[data-state="sky"] { 
             --ling-inset-border-color: rgba(6, 182, 212, 0.35);  --ling-jade-bg-color: #0f1826; --ling-jade-glint: rgba(100, 220, 255, 0.4); 
             --ling-stream-bg: linear-gradient(90deg, #0f1826, #06b6d4, #1d4ed8, #0f1826);
@@ -204,7 +201,7 @@
         }
         .ling-pet-compass[data-state="sky"] .ling-pet-compass__text { color: #ecfeff; text-shadow: -0.5px -0.5px 1px rgba(0,0,0,0.9), 0.5px 0.5px 0.5px rgba(6,182,212,0.4); }
 
-        /* ================= ⚡ 交互激活态响应控制 ================= */
+        /* 交互激活态响应控制 */
         .ling-pet-compass:hover { transform: translateX(0) scale(1.12) !important; opacity: 1 !important; --ling-shadow-y: 15px !important; --ling-shadow-blur: 32px !important; --ling-shadow-opacity: 0.55 !important; }
         .ling-pet-compass:hover .ling-pet-compass__aura { opacity: 0.85; }
         
@@ -222,7 +219,6 @@
         .ling-pet-compass:active { transform: translateX(0) scale(0.95) !important; --ling-shadow-y: 2px !important; --ling-shadow-blur: 5px !important; }
         .ling-pet-compass:active .ling-pet-compass__aura { opacity: 0.2; }
 
-        /* 时辰震荡 */
         .ling-pulse-trigger { animation: lingShock 0.45s cubic-bezier(0.25, 1, 0.5, 1) !important; }
         @keyframes lingShock {
             0% { transform: translateX(0) scale(1); }
@@ -230,21 +226,18 @@
             100% { transform: translateX(0) scale(1); }
         }
 
-        /* 外壳300%平滑流转 */
         @keyframes lingStreamMove {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
 
-        /* 玉面掠影 */
         @keyframes lingJadeGlint {
             0% { left: -150%; }
             22% { left: 150%; }
             100% { left: 150%; } 
         }
 
-        /* ================= 🌊 流体非线性揉杂动画轨迹算法 ================= */
         @keyframes lingVortexPrime {
             0% { transform: rotate(0deg) scale(1) translate(0px, 0px); background-position: 0% 0%; }
             33% { transform: rotate(120deg) scale(1.15) translate(2px, -1px); background-position: 30% 20%; }
@@ -278,17 +271,14 @@
     dot.setAttribute('data-state', 'day'); 
     dot.setAttribute('data-system-drag', '1'); 
 
-    // 护体灵气环层 (__aura)
     const auraRing = document.createElement('div');
     auraRing.className = 'ling-pet-compass__aura';
     dot.appendChild(auraRing);
 
-    // 真玉核心层 (__core)
     const jadeCore = document.createElement('div');
     jadeCore.className = 'ling-pet-compass__core';
     jadeCore.setAttribute('aria-hidden', 'true'); 
 
-    // 【方案二核心】创建流体容纳腔体与双层流体节点
     const fluidContainers = {
         'day': createFluidNest('layer-day'),
         'night': createFluidNest('layer-night'),
@@ -297,7 +287,6 @@
     };
     Object.values(fluidContainers).forEach(nest => jadeCore.appendChild(nest));
 
-    // 真言层 (__text)
     const textLayer = document.createElement('div');
     textLayer.className = 'ling-pet-compass__text';
     textLayer.textContent = '---';
@@ -306,7 +295,6 @@
     dot.appendChild(jadeCore);
     document.body.appendChild(dot);
 
-    // 熔炼流体双层腔体辅助法门
     function createFluidNest(stateClassName) {
         const nest = document.createElement('div');
         nest.className = `ling-pet-compass__fluid-container ${stateClassName}`;
@@ -322,7 +310,7 @@
         return nest;
     }
 
-    // ================= 3. 神识随行：三维物理光影联动 =================
+    // ================= 3. 三维物理光影联动 =================
     document.addEventListener('mousemove', (e) => {
         if (isDragging || isFolded) return; 
         
@@ -409,6 +397,7 @@
         resetFadeTimer();
     }
 
+    // 🌟 核心修改点：挂机静止判定延长至 5 秒 (5000ms)
     function resetFadeTimer() {
         clearTimeout(fadeTimer);
         if (isFolded) {
@@ -416,14 +405,14 @@
             return;
         }
         dot.style.opacity = '1'; 
-        fadeTimer = setTimeout(executeFold, 3000); 
+        fadeTimer = setTimeout(executeFold, 5000); // 💡 原 3000ms 调至 5000ms
     }
     
     dot.addEventListener('mouseenter', resetFadeTimer);
     dot.addEventListener('mousemove', resetFadeTimer);
     dot.addEventListener('touchstart', (e) => { executeWakeUp(); }, { passive: true });
 
-    // ================= 5. 核心状态机时辰监听与流体切换枢纽 =================
+    // ================= 5. 时辰监听与流体切换枢纽 =================
     let lastState = ""; 
 
     function triggerShockwave() {
@@ -454,7 +443,6 @@
         }
 
         if (lastState !== currentState) {
-            // 一印定乾坤：激活对应时辰的液体腔体
             Object.keys(fluidContainers).forEach(key => {
                 if (key === currentState) fluidContainers[key].classList.add('active');
                 else fluidContainers[key].classList.remove('active');
@@ -578,3 +566,5 @@
     setTimeout(updateDotStyle, 500);
 
 })();
+
+```
