@@ -1,6 +1,3 @@
-已将灵珠的挂机自动渐隐时间从原来的 3 秒调整为 **5 秒**（即 5000 毫秒）。
-以下是淬炼后的完整脚本，道友只需全量替换，即可让法宝多悬浮留存两秒，以便有充足的时间感知天道时辰的变化：
-```javascript
 // ==UserScript==
 // @name         灵界时辰天道罗盘
 // @namespace    http://tampermonkey.net/
@@ -566,5 +563,3 @@
     setTimeout(updateDotStyle, 500);
 
 })();
-
-```
