@@ -156,7 +156,7 @@
             mix-blend-mode: screen; transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1); 
         }
         .layer-day    { --aura-color: rgba(147, 197, 253, 0.6); }
-        .layer-night  { --aura-color: rgba(167, 139, 250, 0.5); }
+        .layer-night  { --aura-color: rgb(5, 1, 15); }
         .layer-sunset { --aura-color: rgba(249, 115, 22, 0.65); }
         .layer-sky    { --aura-color: rgba(34, 211, 238, 0.65); }
         .ling-pet-compass__aura-layer.active { opacity: 1; }
