@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         灵界时辰天道罗盘
 // @namespace    http://tampermonkey.net/
-// @version      20.7.7
-// @description  拟物交互视觉正统大成版。全面对齐游戏原生灵兽轩架构：实装 data-state 状态机枢纽，重构三层命名空间与全套 ARIA 无障碍矩阵，法宝自此大隐隐于市。
+// @version      20.7.9
+// @description  拟物交互视觉流体玉莹大成版。全面实装方案二：引入双层逆向非线性涡流矩阵，于真玉核心内还原液态灵汞翻涌、自主吸纳律动的无上仙侠美学。
 // @author       修仙道友
 // @match        https://ling.muge.info/game.html
 // @match        http://ling.muge.info/game.html
@@ -33,7 +33,7 @@
     fontStyleNode.textContent = AMBIENT_FONT;
     document.head.appendChild(fontStyleNode);
 
-    // ================= 1. 正统规范 CSS 大阵 (全面基于 data-state 与命名空间) =================
+    // ================= 1. 流体玉莹 CSS 大阵 (双层逆向非线性涡流) =================
     const STYLES = `
         :root {
             /* 交互联动变量群 */
@@ -50,6 +50,10 @@
             --ling-jade-glint: rgba(255, 255, 255, 0.7);
             --ling-stream-bg: linear-gradient(90deg, #eae8e3, #fcfbf9, #cbd5e1, #eae8e3);
             
+            /* 四象流体灵液核心色轨配置 */
+            --fluid-prime-color: radial-gradient(circle at 30% 30%, rgba(147,197,253,0.8) 0%, transparent 65%);
+            --fluid-sub-color: radial-gradient(circle at 70% 70%, rgba(191,219,254,0.6) 0%, transparent 60%);
+            
             /* 折叠偏移量与绝对触控带尺寸 */
             --ling-fold-transform: translateX(0);
             --ling-shield-width: 0px;
@@ -57,7 +61,7 @@
             --ling-shield-right: auto;
         }
 
-        /* 1. 法宝大圆主体 —— 对齐原生命名规范，接入无障碍响应 */
+        /* 1. 法宝大圆主体 */
         .ling-pet-compass {
             position: fixed;
             top: 85px; right: 20px; z-index: 10000;
@@ -66,11 +70,9 @@
             backdrop-filter: blur(8px) saturate(160%);
             -webkit-backdrop-filter: blur(8px) saturate(160%);
             
-            /* 承载状态机统领的连绵渐变流转底层 */
             background: var(--ling-stream-bg);
             background-size: 300% 100%;
             
-            /* 拟物级联阴影 */
             box-shadow: 
                 var(--ling-shadow-x) var(--ling-shadow-y) var(--ling-shadow-blur) rgba(0, 0, 0, var(--ling-shadow-opacity)),
                 inset -2px -2px 6px rgba(0, 0, 0, 0.4),
@@ -80,8 +82,6 @@
 
             border: 1px dashed rgba(255, 255, 255, 0.08); 
             transform: var(--ling-fold-transform) scale(1);
-            
-            /* 运行凡间杀招：主体流光平滑连绵流转 */
             animation: lingStreamMove 16s linear infinite;
             
             transition: box-shadow 0.35s cubic-bezier(0.25, 1, 0.5, 1),
@@ -89,41 +89,30 @@
                         transform 0.5s cubic-bezier(0.25, 1, 0.36, 1);
         }
 
-        /* 【对齐原生：__aura 护体灵气环层（高斯模糊霓虹）】 */
+        /* __aura 护体灵气环层（高斯模糊霓虹） */
         .ling-pet-compass__aura {
-            position: absolute; 
-            top: -5px; left: -5px; right: -5px; bottom: -5px; 
-            border-radius: 50%;
-            background: var(--ling-stream-bg);
-            background-size: 300% 100%;
-            opacity: 0;
-            filter: blur(12px); 
-            z-index: -2;
-            pointer-events: none;
-            
-            /* 与主体严格共振流转 */
+            position: absolute; top: -5px; left: -5px; right: -5px; bottom: -5px; border-radius: 50%;
+            background: var(--ling-stream-bg); background-size: 300% 100%;
+            opacity: 0; filter: blur(12px); z-index: -2; pointer-events: none;
             animation: lingStreamMove 16s linear infinite;
             transition: opacity 0.45s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
-        /* 虚体扩容法——隐形神识感应盾牌 */
+        /* 隐形神识感应盾牌 */
         .ling-pet-compass::after {
             content: ''; position: absolute; top: -5px; bottom: -5px;
-            width: var(--ling-shield-width);
-            left: var(--ling-shield-left); right: var(--ling-shield-right);
+            width: var(--ling-shield-width); left: var(--ling-shield-left); right: var(--ling-shield-right);
             background: transparent; z-index: -1; pointer-events: auto; cursor: pointer;
         }
 
-        /* 2. 【对齐原生：__core 灵玉核心层】 */
+        /* 2. __core 灵玉核心层 */
         .ling-pet-compass__core {
-            position: absolute;
-            top: 6px; left: 6px; right: 6px; bottom: 6px;
+            position: absolute; top: 6px; left: 6px; right: 6px; bottom: 6px;
             border-radius: 50%; z-index: 5; box-sizing: border-box; overflow: hidden;
             background-color: var(--ling-jade-bg-color);
             background-image: 
-                linear-gradient(45deg, rgba(255,255,255,0.06) 25%, transparent 25%), 
-                linear-gradient(-45deg, rgba(255,255,255,0.06) 25%, transparent 25%),
-                linear-gradient(135deg, rgba(0,0,0,0.02) 25%, transparent 25%);
+                linear-gradient(45deg, rgba(255,255,255,0.05) 25%, transparent 25%), 
+                linear-gradient(-45deg, rgba(255,255,255,0.05) 25%, transparent 25%);
             background-size: 6px 6px; 
             box-shadow: 
                 inset 1.5px 1.5px 3px var(--ling-jade-glint), 
@@ -132,36 +121,44 @@
             transition: background-color 1.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* 核心内部的45°真玉掠影高光 */
+        /* 核心上空真玉镜面45°轻微掠影 */
         .ling-pet-compass__core::after {
             content: ''; position: absolute; top: 0; left: 0; width: 200%; height: 100%;
-            z-index: 6; pointer-events: none;
-            background: linear-gradient(
-                90deg, 
-                transparent 0%, 
-                rgba(255, 255, 255, 0) 35%, 
-                rgba(255, 255, 255, 0.25) 45%, 
-                rgba(255, 255, 255, 0.5) 50%, 
-                rgba(255, 255, 255, 0.25) 55%, 
-                transparent 65%
-            );
-            transform: skewX(-45deg);
-            animation: lingJadeGlint 7s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+            z-index: 8; pointer-events: none;
+            background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0) 40%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0) 60%, transparent 100%);
+            transform: skewX(-45deg); animation: lingJadeGlint 8s cubic-bezier(0.25, 1, 0.5, 1) infinite;
         }
 
-        /* 小圆内部·四象神识动态玉莹图层 */
-        .ling-pet-compass__aura-layer {
-            position: absolute; top: 0; left: 0; right: 0; bottom: 0; border-radius: 50%; opacity: 0; z-index: 1;
-            background-image: radial-gradient(circle at var(--ling-light-x) var(--ling-light-y), var(--aura-color) 0%, transparent 75%);
-            mix-blend-mode: screen; transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1); 
+        /* ================= 🌊 【方案二核心】双层流体玉莹大阵 ================= */
+        .ling-pet-compass__fluid-container {
+            position: absolute; top: -10%; left: -10%; right: -10%; bottom: -10%;
+            border-radius: 50%; opacity: 0; z-index: 2; pointer-events: none;
+            mix-blend-mode: screen; filter: blur(1px); /* 微弱模糊融合两层边缘 */
+            transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .layer-day    { --aura-color: rgba(147, 197, 253, 0.6); }
-        .layer-night  { --aura-color: rgb(5, 1, 15); }
-        .layer-sunset { --aura-color: rgba(249, 115, 22, 0.65); }
-        .layer-sky    { --aura-color: rgba(34, 211, 238, 0.65); }
-        .ling-pet-compass__aura-layer.active { opacity: 1; }
+        .ling-pet-compass__fluid-container.active { opacity: 1; }
 
-        /* 3. 【对齐原生：__text 真言铭牌信息层】 */
+        /* 主流体层：顺时针非线性揉杂涡流 */
+        .ling-pet-compass__fluid-prime {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0; border-radius: 50%;
+            background-image: var(--fluid-prime-color);
+            background-size: 140% 140%;
+            transform-origin: center center;
+            /* 强行绑定神识追踪中心变量 */
+            --mask-x: var(--ling-light-x); --mask-y: var(--ling-light-y);
+            animation: lingVortexPrime 11s cubic-bezier(0.37, 0, 0.63, 1) infinite;
+        }
+
+        /* 次流体层：逆时针对冲拉伸撕裂涡流 */
+        .ling-pet-compass__fluid-sub {
+            position: absolute; top: 5%; left: 5%; right: 5%; bottom: 5%; border-radius: 50%;
+            background-image: var(--fluid-sub-color);
+            background-size: 150% 150%;
+            transform-origin: 45% 55%;
+            animation: lingVortexSub 7s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+        }
+
+        /* 3. __text 真言信息层 */
         .ling-pet-compass__text {
             position: relative; z-index: 10; font-family: "ShuowenZuan", "LiSu", "KaiTi", serif; 
             font-size: 13px; font-weight: 700; text-align: center; line-height: 32px; width: 100%; height: 100%; 
@@ -169,69 +166,63 @@
             transition: color 0.2s ease-in-out, text-shadow 0.2s ease-in-out;
         }
 
-        /* ================= 🎛️ 终极法典：DATA-STATE 状态机视觉规则映射 ================= */
+        /* ================= 🎛️ DATA-STATE 状态机·四象流体极光色轨定义 ================= */
         
-        /* [data-state="day"] 白昼·羊脂白玉大阵 */
+        /* [day] 白昼·羊脂白玉（天蓝伴生金辉流体） */
         .ling-pet-compass[data-state="day"] { 
             --ling-inset-border-color: rgba(44, 53, 62, 0.2); --ling-jade-bg-color: #f5f4f0; --ling-jade-glint: rgba(255, 255, 255, 0.8); 
             --ling-stream-bg: linear-gradient(90deg, #eae8e3, #fcfbf9, #cbd5e1, #eae8e3);
+            --fluid-prime-color: radial-gradient(circle at var(--ling-light-x) var(--ling-light-y), rgba(147, 197, 253, 0.75) 0%, rgba(239, 206, 144, 0.2) 50%, transparent 70%);
+            --fluid-sub-color: radial-gradient(circle at 60% 40%, rgba(219, 234, 254, 0.6) 0%, transparent 60%);
         }
         .ling-pet-compass[data-state="day"] .ling-pet-compass__text { color: #232a30; text-shadow: -0.5px -0.5px 0.5px rgba(0,0,0,0.4), 0.5px 0.5px 0.5px rgba(255,255,255,0.9); }
 
-        /* [data-state="night"] 黑夜·深邃墨翠星河大阵 */
+        /* [night] 黑夜·深邃墨翠（幽紫夜曜伴生玄金流体） */
         .ling-pet-compass[data-state="night"] { 
             --ling-inset-border-color: rgba(197, 160, 89, 0.25); --ling-jade-bg-color: #14161a; --ling-jade-glint: rgba(255, 255, 255, 0.15); 
             --ling-stream-bg: linear-gradient(90deg, #14161a, #231b3c, #524227, #14161a);
+            --fluid-prime-color: radial-gradient(circle at var(--ling-light-x) var(--ling-light-y), rgba(139, 92, 246, 0.7) 0%, rgba(197, 160, 89, 0.25) 45%, transparent 70%);
+            --fluid-sub-color: radial-gradient(circle at 40% 70%, rgba(8b, 5b, 122, 0.5) 0%, transparent 65%);
         }
         .ling-pet-compass[data-state="night"] .ling-pet-compass__text { color: #cbd5e1; text-shadow: -0.5px -0.5px 1px rgba(0,0,0,0.8), 0.5px 0.5px 0.5px rgba(255,255,255,0.2); }
 
-        /* [data-state="sunset"] 夕照·血珀晚霞流光大阵 */
+        /* [sunset] 夕照·血珀精石（赤橙晚霞狂暴流体） */
         .ling-pet-compass[data-state="sunset"] { 
             --ling-inset-border-color: rgba(255, 78, 80, 0.35);  --ling-jade-bg-color: #2b1212; --ling-jade-glint: rgba(255, 120, 120, 0.3); 
             --ling-stream-bg: linear-gradient(90deg, #2b1212, #ff4e50, #f97316, #2b1212);
+            --fluid-prime-color: radial-gradient(circle at var(--ling-light-x) var(--ling-light-y), rgba(249, 115, 22, 0.85) 0%, rgba(220, 38, 38, 0.3) 50%, transparent 70%);
+            --fluid-sub-color: radial-gradient(circle at 30% 60%, rgba(254, 215, 170, 0.5) 0%, transparent 60%);
         }
         .ling-pet-compass[data-state="sunset"] .ling-pet-compass__text { color: #ffe4e6; text-shadow: -0.5px -0.5px 1px rgba(0,0,0,0.9), 0.5px 0.5px 0.5px rgba(255,78,80,0.4); }
 
-        /* [data-state="sky"] 破晓·清冷碧翠寒天大阵 */
+        /* [sky] 破晓·清冷碧翠（青荧冰魄寒天流体） */
         .ling-pet-compass[data-state="sky"] { 
             --ling-inset-border-color: rgba(6, 182, 212, 0.35);  --ling-jade-bg-color: #0f1826; --ling-jade-glint: rgba(100, 220, 255, 0.4); 
             --ling-stream-bg: linear-gradient(90deg, #0f1826, #06b6d4, #1d4ed8, #0f1826);
+            --fluid-prime-color: radial-gradient(circle at var(--ling-light-x) var(--ling-light-y), rgba(34, 211, 238, 0.85) 0%, rgba(29, 78, 216, 0.3) 55%, transparent 75%);
+            --fluid-sub-color: radial-gradient(circle at 65% 65%, rgba(165, 243, 252, 0.55) 0%, transparent 60%);
         }
         .ling-pet-compass[data-state="sky"] .ling-pet-compass__text { color: #ecfeff; text-shadow: -0.5px -0.5px 1px rgba(0,0,0,0.9), 0.5px 0.5px 0.5px rgba(6,182,212,0.4); }
 
-        /* ================= ⚡ 交互状态响应控制 ================= */
-        
-        /* 悬浮激活态（高斯模糊霓虹显现，外部阴影大幅拉长腾空） */
-        .ling-pet-compass:hover { 
-            transform: translateX(0) scale(1.12) !important; 
-            opacity: 1 !important;
-            --ling-shadow-y: 15px !important;
-            --ling-shadow-blur: 32px !important;
-            --ling-shadow-opacity: 0.55 !important;
-        }
+        /* ================= ⚡ 交互激活态响应控制 ================= */
+        .ling-pet-compass:hover { transform: translateX(0) scale(1.12) !important; opacity: 1 !important; --ling-shadow-y: 15px !important; --ling-shadow-blur: 32px !important; --ling-shadow-opacity: 0.55 !important; }
         .ling-pet-compass:hover .ling-pet-compass__aura { opacity: 0.85; }
         
-        /* 悬浮时各状态机的深度内嵌边框增强 */
         .ling-pet-compass[data-state="day"]:hover    { --ling-inset-border-color: rgba(0, 0, 0, 0.65); }
         .ling-pet-compass[data-state="night"]:hover  { --ling-inset-border-color: rgba(197, 160, 89, 0.7); }
         .ling-pet-compass[data-state="sunset"]:hover { --ling-inset-border-color: rgba(255, 78, 80, 0.8); }
         .ling-pet-compass[data-state="sky"]:hover    { --ling-inset-border-color: rgba(6, 182, 212, 0.8); }
 
-        /* 悬浮时真言文字爆出强力起刚效果 */
+        /* 真言爆起高级刚感 */
         .ling-pet-compass[data-state="day"]:hover .ling-pet-compass__text { color: #000000 !important; font-weight: 900 !important; text-shadow: 0px 1px 2px rgba(255, 255, 255, 0.9), 0px 0px 4px rgba(147, 197, 253, 0.6); }
         .ling-pet-compass[data-state="night"]:hover .ling-pet-compass__text { color: #111317 !important; font-weight: 900 !important; -webkit-text-stroke: 0.5px #c5a059; text-shadow: 0 0 6px rgba(167, 139, 250, 0.85); }
         .ling-pet-compass[data-state="sunset"]:hover .ling-pet-compass__text { color: #2b0000 !important; font-weight: 900 !important; -webkit-text-stroke: 0.5px #ff4e50; text-shadow: 0 0 6px rgba(249, 115, 22, 0.9); }
         .ling-pet-compass[data-state="sky"]:hover .ling-pet-compass__text { color: #000c1f !important; font-weight: 900 !important; -webkit-text-stroke: 0.5px #06b6d4; text-shadow: 0 0 6px rgba(34, 211, 238, 0.9); }
 
-        /* 点击内缩 3D 压感 */
-        .ling-pet-compass:active { 
-            transform: translateX(0) scale(0.95) !important; 
-            --ling-shadow-y: 2px !important;
-            --ling-shadow-blur: 5px !important;
-        }
+        .ling-pet-compass:active { transform: translateX(0) scale(0.95) !important; --ling-shadow-y: 2px !important; --ling-shadow-blur: 5px !important; }
         .ling-pet-compass:active .ling-pet-compass__aura { opacity: 0.2; }
 
-        /* 时辰突变震荡 */
+        /* 时辰震荡 */
         .ling-pulse-trigger { animation: lingShock 0.45s cubic-bezier(0.25, 1, 0.5, 1) !important; }
         @keyframes lingShock {
             0% { transform: translateX(0) scale(1); }
@@ -239,18 +230,32 @@
             100% { transform: translateX(0) scale(1); }
         }
 
-        /* 300%大背景平滑连绵流转动画 */
+        /* 外壳300%平滑流转 */
         @keyframes lingStreamMove {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
 
-        /* 玉面高光掠影 */
+        /* 玉面掠影 */
         @keyframes lingJadeGlint {
             0% { left: -150%; }
-            25% { left: 150%; }
+            22% { left: 150%; }
             100% { left: 150%; } 
+        }
+
+        /* ================= 🌊 流体非线性揉杂动画轨迹算法 ================= */
+        @keyframes lingVortexPrime {
+            0% { transform: rotate(0deg) scale(1) translate(0px, 0px); background-position: 0% 0%; }
+            33% { transform: rotate(120deg) scale(1.15) translate(2px, -1px); background-position: 30% 20%; }
+            66% { transform: rotate(240deg) scale(0.9) translate(-1px, 3px); background-position: 10% 40%; }
+            100% { transform: rotate(360deg) scale(1) translate(0px, 0px); background-position: 0% 0%; }
+        }
+
+        @keyframes lingVortexSub {
+            0% { transform: rotate(360deg) scale(1.1) skew(0deg); }
+            50% { transform: rotate(180deg) scale(0.85) skew(6deg); }
+            100% { transform: rotate(0deg) scale(1.1) skew(0deg); }
         }
 
         @media screen and (max-width: 768px) {
@@ -267,12 +272,11 @@
     // ================= 2. 铸造正统无障碍复合 DOM 架构 =================
     const dot = document.createElement('div');
     dot.className = 'ling-pet-compass';
-    // 完美的正统无障碍天道真言注入
     dot.setAttribute('role', 'button');
     dot.setAttribute('aria-live', 'polite');
     dot.setAttribute('title', '天道罗盘：感知当前游戏时辰变化');
-    dot.setAttribute('data-state', 'day'); // 初始设为白昼状态
-    dot.setAttribute('data-system-drag', '1'); // 独立于原生的拖拽识别标印
+    dot.setAttribute('data-state', 'day'); 
+    dot.setAttribute('data-system-drag', '1'); 
 
     // 护体灵气环层 (__aura)
     const auraRing = document.createElement('div');
@@ -282,15 +286,16 @@
     // 真玉核心层 (__core)
     const jadeCore = document.createElement('div');
     jadeCore.className = 'ling-pet-compass__core';
-    jadeCore.setAttribute('aria-hidden', 'true'); // 让辅助工具直接跃过纯视觉层，提升性能
+    jadeCore.setAttribute('aria-hidden', 'true'); 
 
-    const auraLayers = {
-        'day': createAuraLayer('layer-day'),
-        'night': createAuraLayer('layer-night'),
-        'sunset': createAuraLayer('layer-sunset'),
-        'sky': createAuraLayer('layer-sky')
+    // 【方案二核心】创建流体容纳腔体与双层流体节点
+    const fluidContainers = {
+        'day': createFluidNest('layer-day'),
+        'night': createFluidNest('layer-night'),
+        'sunset': createFluidNest('layer-sunset'),
+        'sky': createFluidNest('layer-sky')
     };
-    Object.values(auraLayers).forEach(layer => jadeCore.appendChild(layer));
+    Object.values(fluidContainers).forEach(nest => jadeCore.appendChild(nest));
 
     // 真言层 (__text)
     const textLayer = document.createElement('div');
@@ -301,10 +306,20 @@
     dot.appendChild(jadeCore);
     document.body.appendChild(dot);
 
-    function createAuraLayer(className) {
-        const layer = document.createElement('div');
-        layer.className = `ling-pet-compass__aura-layer ${className}`;
-        return layer;
+    // 熔炼流体双层腔体辅助法门
+    function createFluidNest(stateClassName) {
+        const nest = document.createElement('div');
+        nest.className = `ling-pet-compass__fluid-container ${stateClassName}`;
+        
+        const primeFluid = document.createElement('div');
+        primeFluid.className = 'ling-pet-compass__fluid-prime';
+        
+        const subFluid = document.createElement('div');
+        subFluid.className = 'ling-pet-compass__fluid-sub';
+        
+        nest.appendChild(primeFluid);
+        nest.appendChild(subFluid);
+        return nest;
     }
 
     // ================= 3. 神识随行：三维物理光影联动 =================
@@ -321,8 +336,8 @@
         
         if (distance < 250) {
             const influence = (250 - distance) / 250; 
-            const lightX = 45 - (deltaX / distance) * 16 * influence;
-            const lightY = 45 - (deltaY / distance) * 16 * influence;
+            const lightX = 45 - (deltaX / distance) * 18 * influence;
+            const lightY = 45 - (deltaY / distance) * 18 * influence;
             
             const shadowX = (deltaX / distance) * 10 * influence;
             const shadowY = 6 + (deltaY / distance) * 10 * influence;
@@ -408,7 +423,7 @@
     dot.addEventListener('mousemove', resetFadeTimer);
     dot.addEventListener('touchstart', (e) => { executeWakeUp(); }, { passive: true });
 
-    // ================= 5. 核心状态机时辰监听与切换枢纽 =================
+    // ================= 5. 核心状态机时辰监听与流体切换枢纽 =================
     let lastState = ""; 
 
     function triggerShockwave() {
@@ -438,16 +453,15 @@
                 currentState = "night"; break;
         }
 
-        // 状态机核心断言：只有状态发生真正异动时，才重铸属性大印
         if (lastState !== currentState) {
-            Object.keys(auraLayers).forEach(key => {
-                if (key === currentState) auraLayers[key].classList.add('active');
-                else auraLayers[key].classList.remove('active');
+            // 一印定乾坤：激活对应时辰的液体腔体
+            Object.keys(fluidContainers).forEach(key => {
+                if (key === currentState) fluidContainers[key].classList.add('active');
+                else fluidContainers[key].classList.remove('active');
             });
             
-            // 一印定乾坤：直接改写 data-state
             dot.setAttribute('data-state', currentState);
-            dot.setAttribute('title', `天道罗盘：当前游戏时辰【${hour}时】· 界域【${currentState}】`);
+            dot.setAttribute('title', `天道罗盘：当前游戏时辰【${hour}时】· 界域流体【${currentState}】`);
             
             if (lastState !== "") triggerShockwave();
             lastState = currentState;
