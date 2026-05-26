@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         灵界时辰天道罗盘
 // @namespace    http://tampermonkey.net/
-// @version      20.8.2
-// @description  拟物交互视觉流体玉莹大成版。全面实装第四方向优化：重绘真言空间透视阴影，达成静止悬浮、悬停微沉、点击印入的立体仙侠美学。
+// @version      20.8.3
+// @description  拟物交互视觉流体玉莹大成版。已抹除title属性的文本提示功能，保持天道纯净。
 // @author       修仙道友
 // @match        https://ling.muge.info/game.html
 // @match        http://ling.muge.info/game.html
@@ -33,7 +33,7 @@
     fontStyleNode.textContent = AMBIENT_FONT;
     document.head.appendChild(fontStyleNode);
 
-    // ================= 1. 流体玉莹 CSS 大阵 (融入真言空间透视) =================
+    // ================= 1. 流体玉莹 CSS 大阵 =================
     const STYLES = `
         :root {
             /* 交互联动变量群 */
@@ -157,20 +157,19 @@
             animation: lingVortexSub 7s cubic-bezier(0.45, 0, 0.55, 1) infinite;
         }
 
-        /* 3. 🌟 __text 真言信息层（初始化：浮空透视） */
+        /* 3. __text 真言信息层（初始化：浮空透视） */
         .ling-pet-compass__text {
             position: relative; z-index: 10; font-family: "ShuowenZuan", "LiSu", "KaiTi", serif; 
             font-size: 13px; font-weight: 700; text-align: center; line-height: 32px; width: 100%; height: 100%; 
             display: flex; align-items: center; justify-content: center; padding-top: 1px; box-sizing: border-box;
             
-            /* 基础空间悬浮：微距位移缓动 */
             transform: translateY(-0.5px);
             transition: color 0.3s cubic-bezier(0.25, 1, 0.5, 1), 
                         text-shadow 0.3s cubic-bezier(0.25, 1, 0.5, 1),
                         transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
-        /* DATA-STATE 状态机·四象流体基础态悬浮阴影（浮于表面） */
+        /* DATA-STATE 状态机·四象流体基础态悬浮阴影 */
         .ling-pet-compass[data-state="day"] { 
             --ling-inset-border-color: rgba(44, 53, 62, 0.2); --ling-jade-bg-color: #f5f4f0; --ling-jade-glint: rgba(255, 255, 255, 0.8); 
             --ling-stream-bg: linear-gradient(90deg, #eae8e3, #fcfbf9, #cbd5e1, #eae8e3);
@@ -203,46 +202,28 @@
         }
         .ling-pet-compass[data-state="sky"] .ling-pet-compass__text { color: #ecfeff; text-shadow: 0px 1px 3px rgba(0,0,0,0.6), 0.5px 0.5px 0.5px rgba(6,182,212,0.3); }
 
-        /* ================= ⚡ 交互态：重塑真言入水透视控制 ================= */
+        /* 交互态控制 */
         .ling-pet-compass:hover { transform: translateX(0) scale(1.12) !important; opacity: 1 !important; --ling-shadow-y: 15px !important; --ling-shadow-blur: 32px !important; --ling-shadow-opacity: 0.55 !important; }
         .ling-pet-compass:hover .ling-pet-compass__aura { opacity: 0.85; }
         
-        /* 1. 悬停（Hover）：神识下压，文字微沉破水 */
-        .ling-pet-compass:hover .ling-pet-compass__text {
-            transform: translateY(0.5px) scale(0.98); /* 物理垂直下沉与微缩 */
-        }
+        /* 悬停（Hover）：神识下压，文字微沉破水 */
+        .ling-pet-compass:hover .ling-pet-compass__text { transform: translateY(0.5px) scale(0.98); }
 
         .ling-pet-compass[data-state="day"]:hover    { --ling-inset-border-color: rgba(0, 0, 0, 0.65); }
         .ling-pet-compass[data-state="night"]:hover  { --ling-inset-border-color: rgba(197, 160, 89, 0.7); }
         .ling-pet-compass[data-state="sunset"]:hover { --ling-inset-border-color: rgba(255, 78, 80, 0.8); }
         .ling-pet-compass[data-state="sky"]:hover    { --ling-inset-border-color: rgba(6, 182, 212, 0.8); }
 
-        /* 悬停四象深度沉降投影（真言向流体深处投射清晰黑影） */
-        .ling-pet-compass[data-state="day"]:hover .ling-pet-compass__text { 
-            color: #000000 !important; font-weight: 900 !important; 
-            text-shadow: 0px 0.5px 1px rgba(0, 0, 0, 0.65), 0px 0px 4px rgba(147, 197, 253, 0.8); 
-        }
-        .ling-pet-compass[data-state="night"]:hover .ling-pet-compass__text { 
-            color: #111317 !important; font-weight: 900 !important; -webkit-text-stroke: 0.5px #c5a059; 
-            text-shadow: 0px 0.5px 1.5px rgba(0, 0, 0, 0.95), 0px 0px 6px rgba(167, 139, 250, 0.9); 
-        }
-        .ling-pet-compass[data-state="sunset"]:hover .ling-pet-compass__text { 
-            color: #2b0000 !important; font-weight: 900 !important; -webkit-text-stroke: 0.5px #ff4e50; 
-            text-shadow: 0px 0.5px 1.5px rgba(0, 0, 0, 0.95), 0px 0px 6px rgba(249, 115, 22, 0.95); 
-        }
-        .ling-pet-compass[data-state="sky"]:hover .ling-pet-compass__text { 
-            color: #000c1f !important; font-weight: 900 !important; -webkit-text-stroke: 0.5px #06b6d4; 
-            text-shadow: 0px 0.5px 1.5px rgba(0, 0, 0, 0.95), 0px 0px 6px rgba(34, 211, 238, 0.95); 
-        }
+        /* 悬停四象深度沉降投影 */
+        .ling-pet-compass[data-state="day"]:hover .ling-pet-compass__text { color: #000000 !important; font-weight: 900 !important; text-shadow: 0px 0.5px 1px rgba(0, 0, 0, 0.65), 0px 0px 4px rgba(147, 197, 253, 0.8); }
+        .ling-pet-compass[data-state="night"]:hover .ling-pet-compass__text { color: #111317 !important; font-weight: 900 !important; -webkit-text-stroke: 0.5px #c5a059; text-shadow: 0px 0.5px 1.5px rgba(0, 0, 0, 0.95), 0px 0px 6px rgba(167, 139, 250, 0.9); }
+        .ling-pet-compass[data-state="sunset"]:hover .ling-pet-compass__text { color: #2b0000 !important; font-weight: 900 !important; -webkit-text-stroke: 0.5px #ff4e50; text-shadow: 0px 0.5px 1.5px rgba(0, 0, 0, 0.95), 0px 0px 6px rgba(249, 115, 22, 0.95); }
+        .ling-pet-compass[data-state="sky"]:hover .ling-pet-compass__text { color: #000c1f !important; font-weight: 900 !important; -webkit-text-stroke: 0.5px #06b6d4; text-shadow: 0px 0.5px 1.5px rgba(0, 0, 0, 0.95), 0px 0px 6px rgba(34, 211, 238, 0.95); }
 
-        /* 2. 点击/拖拽（Active）：真言破水，彻底印入流体核心，融合归一 */
+        /* 点击/拖拽（Active） */
         .ling-pet-compass:active { transform: translateX(0) scale(0.95) !important; --ling-shadow-y: 2px !important; --ling-shadow-blur: 5px !important; }
         .ling-pet-compass:active .ling-pet-compass__aura { opacity: 0.2; }
-        
-        .ling-pet-compass:active .ling-pet-compass__text {
-            transform: translateY(1px) scale(0.93) !important; /* 深度嵌入 */
-            text-shadow: 0px 0px 1px rgba(0,0,0,0.8) !important; /* 阴影极度收敛，达成融入质感 */
-        }
+        .ling-pet-compass:active .ling-pet-compass__text { transform: translateY(1px) scale(0.93) !important; text-shadow: 0px 0px 1px rgba(0,0,0,0.8) !important; }
 
         .ling-pulse-trigger { animation: lingShock 0.45s cubic-bezier(0.25, 1, 0.5, 1) !important; }
         @keyframes lingShock {
@@ -287,12 +268,11 @@
     styleNode.textContent = STYLES;
     document.head.appendChild(styleNode);
 
-    // ================= 2. 铸造正统无障碍复合 DOM 架构 =================
+    // ================= 2. 铸造 DOM 架构 =================
     const dot = document.createElement('div');
     dot.className = 'ling-pet-compass';
     dot.setAttribute('role', 'button');
     dot.setAttribute('aria-live', 'polite');
-    dot.setAttribute('title', '天道罗盘：感知当前游戏时辰变化');
     dot.setAttribute('data-state', 'day'); 
     dot.setAttribute('data-system-drag', '1'); 
 
@@ -323,13 +303,10 @@
     function createFluidNest(stateClassName) {
         const nest = document.createElement('div');
         nest.className = `ling-pet-compass__fluid-container ${stateClassName}`;
-        
         const primeFluid = document.createElement('div');
         primeFluid.className = 'ling-pet-compass__fluid-prime';
-        
         const subFluid = document.createElement('div');
         subFluid.className = 'ling-pet-compass__fluid-sub';
-        
         nest.appendChild(primeFluid);
         nest.appendChild(subFluid);
         return nest;
@@ -338,11 +315,9 @@
     // ================= 3. 三维物理光影联动 =================
     document.addEventListener('mousemove', (e) => {
         if (isDragging || isFolded) return; 
-        
         const rect = dot.getBoundingClientRect();
         const dotCenterX = rect.left + rect.width / 2;
         const dotCenterY = rect.top + rect.height / 2;
-        
         const deltaX = e.clientX - dotCenterX;
         const deltaY = e.clientY - dotCenterY;
         const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
@@ -351,7 +326,6 @@
             const influence = (250 - distance) / 250; 
             const lightX = 45 - (deltaX / distance) * 18 * influence;
             const lightY = 45 - (deltaY / distance) * 18 * influence;
-            
             const shadowX = (deltaX / distance) * 10 * influence;
             const shadowY = 6 + (deltaY / distance) * 10 * influence;
             const shadowBlur = 20 + influence * 10;
@@ -381,17 +355,14 @@
 
     function executeFold() {
         if (isDragging || isFolded) return;
-        
         const rect = dot.getBoundingClientRect();
         const winWidth = window.innerWidth;
-        
         const isExactlyOnLeft = rect.left <= 0;
         const isExactlyOnRight = rect.right >= winWidth;
         
         if (isExactlyOnLeft || isExactlyOnRight || rect.left < 40 || (winWidth - rect.right) < 40) {
             isFolded = true;
             dot.style.opacity = '0.35'; 
-            
             dot.style.setProperty('--ling-shadow-y', '1px');
             dot.style.setProperty('--ling-shadow-blur', '3px');
             dot.style.setProperty('--ling-shadow-opacity', '0.15');
@@ -429,7 +400,7 @@
             return;
         }
         dot.style.opacity = '1'; 
-        fadeTimer = setTimeout(executeFold, 5000); // 挂机静止判定维持 5 秒
+        fadeTimer = setTimeout(executeFold, 5000); 
     }
     
     dot.addEventListener('mouseenter', resetFadeTimer);
@@ -472,8 +443,8 @@
                 else fluidContainers[key].classList.remove('active');
             });
             
+            // 🌟 核心修改点：已彻底隐去 title 的悬停显示功能
             dot.setAttribute('data-state', currentState);
-            dot.setAttribute('title', `天道罗盘：当前游戏时辰【${hour}时】· 界域流体【${currentState}】`);
             
             if (lastState !== "") triggerShockwave();
             lastState = currentState;
