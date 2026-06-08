@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         灵界时辰天道罗盘
 // @namespace    http://tampermonkey.net/
-// @version      20.8.5
-// @description  拟物交互视觉流体玉莹大成版。彻底去除长时间未交互自动渐隐与边缘折叠逻辑，使其永久恒常显现。
+// @version      20.8.6
+// @description  拟物交互视觉流体玉莹无瑕版。优化吸附重绘帧、收敛玄青夜色边缘毛边、赋予静止期灵液微流呼吸感。
 // @author       修仙道友
 // @match        https://ling.muge.info/game.html
 // @match        http://ling.muge.info/game.html
@@ -49,13 +49,14 @@
             --ling-jade-bg-color: #f4f3f0;
             --ling-jade-glint: rgba(255, 255, 255, 0.7);
             --ling-stream-bg: linear-gradient(90deg, #eae8e3, #fcfbf9, #cbd5e1, #eae8e3);
+            --ling-blend-mode: screen; /* 动态混合模式定义 */
             
             /* 四象流体灵液核心色轨配置 */
             --fluid-prime-color: radial-gradient(circle at 30% 30%, rgba(147,197,253,0.8) 0%, transparent 65%);
             --fluid-sub-color: radial-gradient(circle at 70% 70%, rgba(191,219,254,0.6) 0%, transparent 60%);
         }
 
-        /* 1. 法宝大圆主体（优化：移除透明度与折叠过渡，永久 100% 显现） */
+        /* 1. 法宝大圆主体 */
         .ling-pet-compass {
             position: fixed;
             top: 85px; right: 20px; z-index: 10000;
@@ -75,21 +76,20 @@
                 inset 0px 0px 2px 3px var(--ling-inset-border-color);   
 
             border: 1px dashed rgba(255, 255, 255, 0.08); 
-            opacity: 1 !important; /* 恒常显现 */
+            opacity: 1 !important; 
             transform: scale(1);
             animation: lingStreamMove 16s linear infinite;
             
+            /* 动效增强：平滑非线性吸附与缓动 */
             transition: box-shadow 0.35s cubic-bezier(0.25, 1, 0.5, 1),
-                        transform 0.5s cubic-bezier(0.25, 1, 0.36, 1),
-                        left 0.4s cubic-bezier(0.25, 1, 0.5, 1),
-                        top 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+                        transform 0.4s cubic-bezier(0.25, 1, 0.36, 1);
         }
 
-        /* __aura 护体灵气环层 */
+        /* __aura 护体灵气环层（静止时赋予 0.15 的微弱呼吸感） */
         .ling-pet-compass__aura {
             position: absolute; top: -5px; left: -5px; right: -5px; bottom: -5px; border-radius: 50%;
             background: var(--ling-stream-bg); background-size: 300% 100%;
-            opacity: 0; filter: blur(12px); z-index: -2; pointer-events: none;
+            opacity: 0.15; filter: blur(12px); z-index: -2; pointer-events: none;
             animation: lingStreamMove 16s linear infinite;
             transition: opacity 0.45s cubic-bezier(0.25, 1, 0.5, 1);
         }
@@ -122,7 +122,7 @@
         .ling-pet-compass__fluid-container {
             position: absolute; top: -10%; left: -10%; right: -10%; bottom: -10%;
             border-radius: 50%; opacity: 0; z-index: 2; pointer-events: none;
-            mix-blend-mode: screen; filter: blur(1px); 
+            mix-blend-mode: var(--ling-blend-mode); filter: blur(1px); 
             transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .ling-pet-compass__fluid-container.active { opacity: 1; }
@@ -163,26 +163,29 @@
         .ling-pet-compass[data-state="day"] { 
             --ling-inset-border-color: rgba(44, 53, 62, 0.2); --ling-jade-bg-color: #f5f4f0; --ling-jade-glint: rgba(255, 255, 255, 0.8); 
             --ling-stream-bg: linear-gradient(90deg, #eae8e3, #fcfbf9, #cbd5e1, #eae8e3);
+            --ling-blend-mode: screen;
             --fluid-prime-color: radial-gradient(circle at var(--ling-light-x) var(--ling-light-y), rgba(147, 197, 253, 0.75) 0%, rgba(239, 206, 144, 0.2) 50%, transparent 70%);
             --fluid-sub-color: radial-gradient(circle at 60% 40%, rgba(219, 234, 254, 0.6) 0%, transparent 60%);
         }
         .ling-pet-compass[data-state="day"] .ling-pet-compass__text { color: #232a30; text-shadow: 0px 1px 2px rgba(0,0,0,0.18), 0.5px 0.5px 0.5px rgba(255,255,255,0.9); }
 
-        /* [夜间：寒潭玄青与幽冥墨蓝] */
+        /* [夜间：优化收敛边缘截断点，并调整混合模式为 overlay，去除灰边] */
         .ling-pet-compass[data-state="night"] { 
-            --ling-inset-border-color: rgba(56, 189, 248, 0.18); 
+            --ling-inset-border-color: rgba(56, 189, 248, 0.22); 
             --ling-jade-bg-color: #0b0f17;                       
-            --ling-jade-glint: rgba(255, 255, 255, 0.12); 
+            --ling-jade-glint: rgba(255, 255, 255, 0.08); 
             --ling-stream-bg: linear-gradient(90deg, #090d14, #0f172a, #1e293b, #090d14); 
-            --fluid-prime-color: radial-gradient(circle at var(--ling-light-x) var(--ling-light-y), rgba(56, 189, 248, 0.75) 0%, rgba(30, 41, 59, 0.5) 45%, transparent 75%);
-            --fluid-sub-color: radial-gradient(circle at 40% 70%, rgba(15, 23, 42, 0.95) 0%, transparent 65%);
+            --ling-blend-mode: overlay; /* 幽暗底色下采用叠加模式使光影融合更自然 */
+            --fluid-prime-color: radial-gradient(circle at var(--ling-light-x) var(--ling-light-y), rgba(56, 189, 248, 0.85) 0%, rgba(30, 41, 59, 0.6) 35%, transparent 60%);
+            --fluid-sub-color: radial-gradient(circle at 40% 70%, rgba(15, 23, 42, 0.95) 0%, transparent 55%);
         }
-        .ling-pet-compass[data-state="night"] .ling-pet-compass__text { color: #f1f5f9; text-shadow: 0px 1px 3px rgba(0,0,0,0.95), 0px 0px 3px rgba(56,189,248,0.2); }
+        .ling-pet-compass[data-state="night"] .ling-pet-compass__text { color: #f1f5f9; text-shadow: 0px 1px 3px rgba(0,0,0,0.95), 0px 0px 3px rgba(56,189,248,0.25); }
 
         /* [黄昏：夕照熔金] */
         .ling-pet-compass[data-state="sunset"] { 
             --ling-inset-border-color: rgba(255, 78, 80, 0.35);  --ling-jade-bg-color: #2b1212; --ling-jade-glint: rgba(255, 120, 120, 0.3); 
             --ling-stream-bg: linear-gradient(90deg, #2b1212, #ff4e50, #f97316, #2b1212);
+            --ling-blend-mode: screen;
             --fluid-prime-color: radial-gradient(circle at var(--ling-light-x) var(--ling-light-y), rgba(249, 115, 22, 0.85) 0%, rgba(220, 38, 38, 0.3) 50%, transparent 70%);
             --fluid-sub-color: radial-gradient(circle at 30% 60%, rgba(254, 215, 170, 0.5) 0%, transparent 60%);
         }
@@ -192,6 +195,7 @@
         .ling-pet-compass[data-state="sky"] { 
             --ling-inset-border-color: rgba(6, 182, 212, 0.35);  --ling-jade-bg-color: #0f1826; --ling-jade-glint: rgba(100, 220, 255, 0.4); 
             --ling-stream-bg: linear-gradient(90deg, #0f1826, #06b6d4, #1d4ed8, #0f1826);
+            --ling-blend-mode: screen;
             --fluid-prime-color: radial-gradient(circle at var(--ling-light-x) var(--ling-light-y), rgba(34, 211, 238, 0.85) 0%, rgba(29, 78, 216, 0.3) 55%, transparent 75%);
             --fluid-sub-color: radial-gradient(circle at 65% 65%, rgba(165, 243, 252, 0.55) 0%, transparent 60%);
         }
@@ -239,15 +243,15 @@
 
         @keyframes lingVortexPrime {
             0% { transform: rotate(0deg) scale(1) translate(0px, 0px); background-position: 0% 0%; }
-            33% { transform: rotate(120deg) scale(1.15) translate(2px, -1px); background-position: 30% 20%; }
-            66% { transform: rotate(240deg) scale(0.9) translate(-1px, 3px); background-position: 10% 40%; }
+            33% { transform: rotate(120deg) scale(1.08) translate(1px, -0.5px); background-position: 30% 20%; }
+            66% { transform: rotate(240deg) scale(0.95) translate(-0.5px, 1.5px); background-position: 10% 40%; }
             100% { transform: rotate(360deg) scale(1) translate(0px, 0px); background-position: 0% 0%; }
         }
 
         @keyframes lingVortexSub {
-            0% { transform: rotate(360deg) scale(1.1) skew(0deg); }
-            50% { transform: rotate(180deg) scale(0.85) skew(6deg); }
-            100% { transform: rotate(0deg) scale(1.1) skew(0deg); }
+            0% { transform: rotate(360deg) scale(1.05) skew(0deg); }
+            50% { transform: rotate(180deg) scale(0.92) skew(3deg); }
+            100% { transform: rotate(0deg) scale(1.05) skew(0deg); }
         }
 
         @media screen and (max-width: 768px) {
@@ -392,7 +396,7 @@
     const targetNode = document.getElementById('headerGameTime');
     if (targetNode) observer.observe(targetNode, { childList: true, characterData: true, subtree: true, attributes: true });
 
-    // ================= 5. 严密物理拖拽与双向磁力吸附 =================
+    // ================= 5. 严密物理拖拽与精细重绘吸附 =================
     let isDragging = false;
     let offsetX, offsetY;
 
@@ -423,6 +427,12 @@
         finalLeft = Math.max(0, Math.min(winWidth - dotWidth, finalLeft));
         finalTop = Math.max(0, Math.min(winHeight - dotHeight, finalTop));
 
+        // 飞升优化：将 transition 移入吸附内部，确保仅在松开瞬间产生连贯吸附，拒绝帧抖动
+        dot.style.transition = 'box-shadow 0.25s cubic-bezier(0.25, 1, 0.5, 1), transform 0.3s ease, left 0.4s cubic-bezier(0.25, 1, 0.5, 1), top 0.4s cubic-bezier(0.25, 1, 0.5, 1)';
+        
+        // 强制触发重绘，防止浏览器合并过渡帧
+        dot.offsetHeight; 
+
         dot.style.left = finalLeft + 'px';
         dot.style.top = finalTop + 'px';
 
@@ -445,7 +455,7 @@
         isDragging = true;
         offsetX = clientX - dot.getBoundingClientRect().left;
         offsetY = clientY - dot.getBoundingClientRect().top;
-        dot.style.transition = 'none'; 
+        dot.style.transition = 'none'; // 拖拽中完全由硬件接管
     };
 
     const moveDrag = (clientX, clientY) => {
@@ -459,7 +469,6 @@
     const endDrag = () => {
         if (!isDragging) return;
         isDragging = false;
-        dot.style.transition = 'box-shadow 0.25s cubic-bezier(0.25, 1, 0.5, 1), left 0.4s cubic-bezier(0.25, 1, 0.5, 1), top 0.4s cubic-bezier(0.25, 1, 0.5, 1), transform 0.3s ease';
         snapToEdges(parseFloat(dot.style.left), parseFloat(dot.style.top));
     };
 
@@ -479,6 +488,7 @@
 
     window.addEventListener('resize', () => {
         if (!dot.style.left) return;
+        dot.style.transition = 'none';
         snapToEdges(parseFloat(dot.style.left), parseFloat(dot.style.top));
     });
 
