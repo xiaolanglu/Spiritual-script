@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         灵界时辰天道罗盘
 // @namespace    http://tampermonkey.net/
-// @version      20.8.4
-// @description  拟物交互视觉流体玉莹大成版。重铸夜间流体为正统冷冽的“寒潭玄青与幽冥墨蓝”色轨，更契合深邃修仙夜景。
+// @version      20.8.5
+// @description  拟物交互视觉流体玉莹大成版。彻底去除长时间未交互自动渐隐与边缘折叠逻辑，使其永久恒常显现。
 // @author       修仙道友
 // @match        https://ling.muge.info/game.html
 // @match        http://ling.muge.info/game.html
@@ -33,7 +33,7 @@
     fontStyleNode.textContent = AMBIENT_FONT;
     document.head.appendChild(fontStyleNode);
 
-    // ================= 1. 流体玉莹 CSS 大阵 (全量注入玄青夜色) =================
+    // ================= 1. 流体玉莹 CSS 大阵 =================
     const STYLES = `
         :root {
             /* 交互联动变量群 */
@@ -53,15 +53,9 @@
             /* 四象流体灵液核心色轨配置 */
             --fluid-prime-color: radial-gradient(circle at 30% 30%, rgba(147,197,253,0.8) 0%, transparent 65%);
             --fluid-sub-color: radial-gradient(circle at 70% 70%, rgba(191,219,254,0.6) 0%, transparent 60%);
-            
-            /* 折叠偏移量与绝对触控带尺寸 */
-            --ling-fold-transform: translateX(0);
-            --ling-shield-width: 0px;
-            --ling-shield-left: auto;
-            --ling-shield-right: auto;
         }
 
-        /* 1. 法宝大圆主体 */
+        /* 1. 法宝大圆主体（优化：移除透明度与折叠过渡，永久 100% 显现） */
         .ling-pet-compass {
             position: fixed;
             top: 85px; right: 20px; z-index: 10000;
@@ -81,12 +75,14 @@
                 inset 0px 0px 2px 3px var(--ling-inset-border-color);   
 
             border: 1px dashed rgba(255, 255, 255, 0.08); 
-            transform: var(--ling-fold-transform) scale(1);
+            opacity: 1 !important; /* 恒常显现 */
+            transform: scale(1);
             animation: lingStreamMove 16s linear infinite;
             
             transition: box-shadow 0.35s cubic-bezier(0.25, 1, 0.5, 1),
-                        opacity 0.6s cubic-bezier(0.25, 1, 0.5, 1),
-                        transform 0.5s cubic-bezier(0.25, 1, 0.36, 1);
+                        transform 0.5s cubic-bezier(0.25, 1, 0.36, 1),
+                        left 0.4s cubic-bezier(0.25, 1, 0.5, 1),
+                        top 0.4s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
         /* __aura 护体灵气环层 */
@@ -96,13 +92,6 @@
             opacity: 0; filter: blur(12px); z-index: -2; pointer-events: none;
             animation: lingStreamMove 16s linear infinite;
             transition: opacity 0.45s cubic-bezier(0.25, 1, 0.5, 1);
-        }
-
-        /* 隐形神识感应盾牌 */
-        .ling-pet-compass::after {
-            content: ''; position: absolute; top: -5px; bottom: -5px;
-            width: var(--ling-shield-width); left: var(--ling-shield-left); right: var(--ling-shield-right);
-            background: transparent; z-index: -1; pointer-events: auto; cursor: pointer;
         }
 
         /* 2. __core 灵玉核心层 */
@@ -121,7 +110,7 @@
             transition: background-color 1.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* 核心上空真玉镜面45°轻微掠影 */
+        /* 核心上空真玉镜面轻微掠影 */
         .ling-pet-compass__core::after {
             content: ''; position: absolute; top: 0; left: 0; width: 200%; height: 100%;
             z-index: 8; pointer-events: none;
@@ -162,7 +151,6 @@
             position: relative; z-index: 10; font-family: "ShuowenZuan", "LiSu", "KaiTi", serif; 
             font-size: 13px; font-weight: 700; text-align: center; line-height: 32px; width: 100%; height: 100%; 
             display: flex; align-items: center; justify-content: center; padding-top: 1px; box-sizing: border-box;
-            
             transform: translateY(-0.5px);
             transition: color 0.3s cubic-bezier(0.25, 1, 0.5, 1), 
                         text-shadow 0.3s cubic-bezier(0.25, 1, 0.5, 1),
@@ -180,18 +168,15 @@
         }
         .ling-pet-compass[data-state="day"] .ling-pet-compass__text { color: #232a30; text-shadow: 0px 1px 2px rgba(0,0,0,0.18), 0.5px 0.5px 0.5px rgba(255,255,255,0.9); }
 
-        /* 🌌 [重铸夜间：寒潭玄青与幽冥墨蓝] */
+        /* [夜间：寒潭玄青与幽冥墨蓝] */
         .ling-pet-compass[data-state="night"] { 
-            --ling-inset-border-color: rgba(56, 189, 248, 0.18); /* 冷冽微弱的月华边界线 */
-            --ling-jade-bg-color: #0b0f17;                       /* 极黑的寒潭玄青底色 */
+            --ling-inset-border-color: rgba(56, 189, 248, 0.18); 
+            --ling-jade-bg-color: #0b0f17;                       
             --ling-jade-glint: rgba(255, 255, 255, 0.12); 
-            --ling-stream-bg: linear-gradient(90deg, #090d14, #0f172a, #1e293b, #090d14); /* 墨蓝到玄青的外环过渡 */
-            /* 主流体：玄青裹挟一抹冷月华蓝 */
+            --ling-stream-bg: linear-gradient(90deg, #090d14, #0f172a, #1e293b, #090d14); 
             --fluid-prime-color: radial-gradient(circle at var(--ling-light-x) var(--ling-light-y), rgba(56, 189, 248, 0.75) 0%, rgba(30, 41, 59, 0.5) 45%, transparent 75%);
-            /* 次流体：寂灭幽夜蓝漩涡对冲 */
             --fluid-sub-color: radial-gradient(circle at 40% 70%, rgba(15, 23, 42, 0.95) 0%, transparent 65%);
         }
-        /* 寂灭之夜下的清冷月白真言 */
         .ling-pet-compass[data-state="night"] .ling-pet-compass__text { color: #f1f5f9; text-shadow: 0px 1px 3px rgba(0,0,0,0.95), 0px 0px 3px rgba(56,189,248,0.2); }
 
         /* [黄昏：夕照熔金] */
@@ -213,34 +198,31 @@
         .ling-pet-compass[data-state="sky"] .ling-pet-compass__text { color: #ecfeff; text-shadow: 0px 1px 3px rgba(0,0,0,0.6), 0.5px 0.5px 0.5px rgba(6,182,212,0.3); }
 
         /* ==================== ⚡ 交互状态响应 ==================== */
-        .ling-pet-compass:hover { transform: translateX(0) scale(1.12) !important; opacity: 1 !important; --ling-shadow-y: 15px !important; --ling-shadow-blur: 32px !important; --ling-shadow-opacity: 0.55 !important; }
+        .ling-pet-compass:hover { transform: scale(1.12) !important; --ling-shadow-y: 15px !important; --ling-shadow-blur: 32px !important; --ling-shadow-opacity: 0.55 !important; }
         .ling-pet-compass:hover .ling-pet-compass__aura { opacity: 0.85; }
-        
-        /* 悬停（Hover）：神识下压，文字微沉破水 */
         .ling-pet-compass:hover .ling-pet-compass__text { transform: translateY(0.5px) scale(0.98); }
 
         .ling-pet-compass[data-state="day"]:hover    { --ling-inset-border-color: rgba(0, 0, 0, 0.65); }
-        .ling-pet-compass[data-state="night"]:hover  { --ling-inset-border-color: rgba(56, 189, 248, 0.7); } /* 悬停强化月华边 */
+        .ling-pet-compass[data-state="night"]:hover  { --ling-inset-border-color: rgba(56, 189, 248, 0.7); } 
         .ling-pet-compass[data-state="sunset"]:hover { --ling-inset-border-color: rgba(255, 78, 80, 0.8); }
         .ling-pet-compass[data-state="sky"]:hover    { --ling-inset-border-color: rgba(6, 182, 212, 0.8); }
 
         /* 悬停四象深度沉降投影 */
         .ling-pet-compass[data-state="day"]:hover .ling-pet-compass__text { color: #000000 !important; font-weight: 900 !important; text-shadow: 0px 0.5px 1px rgba(0, 0, 0, 0.65), 0px 0px 4px rgba(147, 197, 253, 0.8); }
-        /* 🌌 玄青夜色悬停爆起：月华淡银镶边，冷翠高光 */
         .ling-pet-compass[data-state="night"]:hover .ling-pet-compass__text { color: #090d16 !important; font-weight: 900 !important; -webkit-text-stroke: 0.5px #e2e8f0; text-shadow: 0px 0.5px 1.5px rgba(0, 0, 0, 0.98), 0px 0px 6px rgba(56, 189, 248, 0.95); }
         .ling-pet-compass[data-state="sunset"]:hover .ling-pet-compass__text { color: #2b0000 !important; font-weight: 900 !important; -webkit-text-stroke: 0.5px #ff4e50; text-shadow: 0px 0.5px 1.5px rgba(0, 0, 0, 0.95), 0px 0px 6px rgba(249, 115, 22, 0.95); }
         .ling-pet-compass[data-state="sky"]:hover .ling-pet-compass__text { color: #000c1f !important; font-weight: 900 !important; -webkit-text-stroke: 0.5px #06b6d4; text-shadow: 0px 0.5px 1.5px rgba(0, 0, 0, 0.95), 0px 0px 6px rgba(34, 211, 238, 0.95); }
 
         /* 点击/拖拽（Active） */
-        .ling-pet-compass:active { transform: translateX(0) scale(0.95) !important; --ling-shadow-y: 2px !important; --ling-shadow-blur: 5px !important; }
+        .ling-pet-compass:active { transform: scale(0.95) !important; --ling-shadow-y: 2px !important; --ling-shadow-blur: 5px !important; }
         .ling-pet-compass:active .ling-pet-compass__aura { opacity: 0.2; }
         .ling-pet-compass:active .ling-pet-compass__text { transform: translateY(1px) scale(0.93) !important; text-shadow: 0px 0px 1px rgba(0,0,0,0.8) !important; }
 
         .ling-pulse-trigger { animation: lingShock 0.45s cubic-bezier(0.25, 1, 0.5, 1) !important; }
         @keyframes lingShock {
-            0% { transform: translateX(0) scale(1); }
-            30% { transform: translateX(0) scale(1.15); box-shadow: 0 0 35px rgba(255,255,255,0.5); }
-            100% { transform: translateX(0) scale(1); }
+            0% { transform: scale(1); }
+            30% { transform: scale(1.15); box-shadow: 0 0 35px rgba(255,255,255,0.5); }
+            100% { transform: scale(1); }
         }
 
         @keyframes lingStreamMove {
@@ -325,7 +307,7 @@
 
     // ================= 3. 三维物理光影联动 =================
     document.addEventListener('mousemove', (e) => {
-        if (isDragging || isFolded) return; 
+        if (isDragging) return; 
         const rect = dot.getBoundingClientRect();
         const dotCenterX = rect.left + rect.width / 2;
         const dotCenterY = rect.top + rect.height / 2;
@@ -360,65 +342,7 @@
         dot.style.setProperty('--ling-shadow-opacity', '0.35');
     }
 
-    // ================= 4. 纳芥半隐与智能双向折叠算法 =================
-    let fadeTimer = null;
-    let isFolded = false; 
-
-    function executeFold() {
-        if (isDragging || isFolded) return;
-        const rect = dot.getBoundingClientRect();
-        const winWidth = window.innerWidth;
-        const isExactlyOnLeft = rect.left <= 0;
-        const isExactlyOnRight = rect.right >= winWidth;
-        
-        if (isExactlyOnLeft || isExactlyOnRight || rect.left < 40 || (winWidth - rect.right) < 40) {
-            isFolded = true;
-            dot.style.opacity = '0.35'; 
-            dot.style.setProperty('--ling-shadow-y', '1px');
-            dot.style.setProperty('--ling-shadow-blur', '3px');
-            dot.style.setProperty('--ling-shadow-opacity', '0.15');
-
-            if (isExactlyOnLeft || rect.left < winWidth / 2) {
-                dot.style.setProperty('--ling-fold-transform', 'translateX(-68%)');
-                dot.style.setProperty('--ling-shield-width', '24px');
-                dot.style.setProperty('--ling-shield-left', '100%');
-                dot.style.setProperty('--ling-shield-right', 'auto');
-            } else {
-                dot.style.setProperty('--ling-fold-transform', 'translateX(68%)');
-                dot.style.setProperty('--ling-shield-width', '24px');
-                dot.style.setProperty('--ling-shield-left', 'auto');
-                dot.style.setProperty('--ling-shield-right', '100%');
-            }
-        } else {
-            dot.style.opacity = '0.35';
-        }
-    }
-
-    function executeWakeUp() {
-        if (!isFolded && dot.style.opacity === '1') return;
-        isFolded = false;
-        dot.style.opacity = '1';
-        dot.style.setProperty('--ling-fold-transform', 'translateX(0)');
-        dot.style.setProperty('--ling-shield-width', '0px');
-        resetLightVariables();
-        resetFadeTimer();
-    }
-
-    function resetFadeTimer() {
-        clearTimeout(fadeTimer);
-        if (isFolded) {
-            executeWakeUp();
-            return;
-        }
-        dot.style.opacity = '1'; 
-        fadeTimer = setTimeout(executeFold, 5000); 
-    }
-    
-    dot.addEventListener('mouseenter', resetFadeTimer);
-    dot.addEventListener('mousemove', resetFadeTimer);
-    dot.addEventListener('touchstart', (e) => { executeWakeUp(); }, { passive: true });
-
-    // ================= 5. 时辰监听与流体切换枢纽 =================
+    // ================= 4. 时辰监听与流体切换枢纽 =================
     let lastState = ""; 
 
     function triggerShockwave() {
@@ -468,7 +392,7 @@
     const targetNode = document.getElementById('headerGameTime');
     if (targetNode) observer.observe(targetNode, { childList: true, characterData: true, subtree: true, attributes: true });
 
-    // ================= 6. 严密物理拖拽与双向磁力吸附 =================
+    // ================= 5. 严密物理拖拽与双向磁力吸附 =================
     let isDragging = false;
     let offsetX, offsetY;
 
@@ -499,14 +423,10 @@
         finalLeft = Math.max(0, Math.min(winWidth - dotWidth, finalLeft));
         finalTop = Math.max(0, Math.min(winHeight - dotHeight, finalTop));
 
-        dot.style.transition = 'box-shadow 0.25s cubic-bezier(0.25, 1, 0.5, 1), left 0.4s cubic-bezier(0.25, 1, 0.5, 1), top 0.4s cubic-bezier(0.25, 1, 0.5, 1), transform 0.3s ease, opacity 0.6s';
         dot.style.left = finalLeft + 'px';
         dot.style.top = finalTop + 'px';
 
         localStorage.setItem('ling_time_dot_position', JSON.stringify({ left: finalLeft, top: finalTop }));
-        
-        isFolded = false; 
-        resetFadeTimer(); 
     }
 
     function loadSavedPosition() {
@@ -519,14 +439,10 @@
                 dot.style.right = 'auto'; 
             } catch (e) {}
         }
-        resetFadeTimer();
     }
 
     const startDrag = (clientX, clientY) => {
         isDragging = true;
-        clearTimeout(fadeTimer);
-        if (isFolded) { executeWakeUp(); return; }
-        dot.style.opacity = '1';
         offsetX = clientX - dot.getBoundingClientRect().left;
         offsetY = clientY - dot.getBoundingClientRect().top;
         dot.style.transition = 'none'; 
@@ -543,18 +459,17 @@
     const endDrag = () => {
         if (!isDragging) return;
         isDragging = false;
+        dot.style.transition = 'box-shadow 0.25s cubic-bezier(0.25, 1, 0.5, 1), left 0.4s cubic-bezier(0.25, 1, 0.5, 1), top 0.4s cubic-bezier(0.25, 1, 0.5, 1), transform 0.3s ease';
         snapToEdges(parseFloat(dot.style.left), parseFloat(dot.style.top));
     };
 
     dot.addEventListener('mousedown', (e) => {
-        if (isFolded) { executeWakeUp(); e.preventDefault(); return; }
         startDrag(e.clientX, e.clientY);
     });
     document.addEventListener('mousemove', (e) => moveDrag(e.clientX, e.clientY));
     document.addEventListener('mouseup', endDrag);
 
     dot.addEventListener('touchstart', (e) => {
-        if (isFolded) { executeWakeUp(); return; }
         if (e.touches.length > 0) startDrag(e.touches[0].clientX, e.touches[0].clientY);
     }, { passive: true });
     dot.addEventListener('touchmove', (e) => {
