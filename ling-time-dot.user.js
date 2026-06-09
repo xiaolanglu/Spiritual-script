@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         灵界时辰天道罗盘
 // @namespace    http://tampermonkey.net/
-// @version      21.2.0
-// @description  高阶进化的流光折射磨砂玻璃椭圆按钮。引入动态视角折射光斑、双层高阶环境阴影与天道融霜过渡。
+// @version      22.1.0
+// @description  极致精简纯净版。磨砂玻璃椭圆按钮，仅添加双击障眼法（潜行隐藏）功能，轻量通透，无缝融入修仙界面。
 // @author       修仙道友
 // @match        https://ling.muge.info/game.html
 // @match        http://ling.muge.info/game.html
@@ -65,7 +65,7 @@
             
             /* 渲染防御与性能加速 */
             contain: layout style;
-            will-change: transform, box-shadow, left, top;
+            will-change: transform, box-shadow, left, top, opacity;
             
             /* 14px 醇厚毛玻璃高斯模糊 */
             backdrop-filter: blur(14px) saturate(155%) contrast(98%);
@@ -73,7 +73,7 @@
             
             background: var(--glass-aurora-bg);
             
-            /* 分层投影：接触级阴影(Umbra) + 扩散级阴影(Penumbra) + 双重物理内嵌光 */
+            /* 分层投影：接触级阴影 + 扩散级阴影 + 双重物理内嵌光 */
             box-shadow: 
                 0px var(--glass-umbra-y) var(--glass-umbra-blur) rgba(0, 0, 0, calc(var(--glass-shadow-opacity) * 1.2)),
                 0px var(--glass-penumbra-y) var(--glass-penumbra-blur) rgba(0, 0, 0, var(--glass-shadow-opacity)),
@@ -90,7 +90,17 @@
             transition: border-color 0.4s ease,
                         box-shadow 0.45s cubic-bezier(0.25, 1, 0.5, 1),
                         backdrop-filter 0.5s ease,
+                        opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1),
                         transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        /* ⚡ 障眼法匿迹状态：大隐隐于市，几近虚无 */
+        .ling-pet-compass.ling-anqi-hidden {
+            opacity: 0.05 !important;
+        }
+        /* 虽已匿迹，但仙识扫过（鼠标悬停）时依然隐约可见，方便寻回 */
+        .ling-pet-compass.ling-anqi-hidden:hover {
+            opacity: 0.75 !important;
         }
 
         /* 2. 物理边缘对流光 (Rim Light) */
@@ -116,17 +126,14 @@
         .ling-pet-compass__aurora-core {
             position: absolute; top: 0; left: 0; right: 0; bottom: 0;
             border-radius: 17px; z-index: 2; pointer-events: none;
-            
-            /* 极淡的物理噪点感，赋予模糊物理实体厚度 */
             background-image: var(--glass-aurora-bg), url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='1' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.012'/%3E%3C/svg%3E");
-            
             mix-blend-mode: normal;
             opacity: 0.95;
             animation: glassAuroraBreathe 12s ease-in-out infinite alternate;
             transition: background 1.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* 5. __text 真言层（视差与深层微雕） */
+        /* 5. __text 真言层 */
         .ling-pet-compass__text {
             position: relative; z-index: 10; 
             font-family: "ShuowenZuan", "LiSu", "KaiTi", serif; 
@@ -140,12 +147,10 @@
             color: var(--glass-text-color);
             text-shadow: var(--glass-text-shadow);
             
-            transition: color 0.3.5s ease, text-shadow 0.35s ease, transform 0.45s cubic-bezier(0.25, 1, 0.5, 1);
+            transition: color 0.35s ease, text-shadow 0.35s ease, transform 0.45s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
         /* ==================== DATA-STATE 状态机 · 四象磨砂极光 ==================== */
-        
-        /* [白昼：昆仑耀白] */
         .ling-pet-compass[data-state="day"] { 
             --glass-border-color: rgba(255, 255, 255, 0.6);
             --glass-text-color: #1a2126;
@@ -154,7 +159,6 @@
             --glass-aurora-bg: radial-gradient(circle at 15% 20%, rgba(219, 234, 254, 0.65) 0%, rgba(255, 255, 255, 0.3) 55%, rgba(245, 244, 240, 0.1) 100%);
         }
 
-        /* [夜间：幽玄冥海] */
         .ling-pet-compass[data-state="night"] { 
             --glass-border-color: rgba(56, 189, 248, 0.35);
             --glass-text-color: #f8fafc;
@@ -163,7 +167,6 @@
             --glass-aurora-bg: radial-gradient(circle at 20% 15%, rgba(14, 165, 233, 0.4) 0%, rgba(15, 23, 42, 0.78) 55%, rgba(8, 10, 15, 0.65) 100%);
         }
 
-        /* [黄昏：烈火熔金] */
         .ling-pet-compass[data-state="sunset"] { 
             --glass-border-color: rgba(251, 146, 60, 0.5);
             --glass-text-color: #fff1f2;
@@ -172,7 +175,6 @@
             --glass-aurora-bg: radial-gradient(circle at 25% 20%, rgba(249, 115, 22, 0.52) 0%, rgba(185, 28, 28, 0.28) 60%, rgba(40, 10, 10, 0.45) 100%);
         }
 
-        /* [破晓：九天青冥] */
         .ling-pet-compass[data-state="sky"] { 
             --glass-border-color: rgba(34, 211, 238, 0.5);
             --glass-text-color: #f0fdfa;
@@ -181,9 +183,7 @@
             --glass-aurora-bg: radial-gradient(circle at 20% 20%, rgba(6, 182, 212, 0.52) 0%, rgba(30, 64, 175, 0.28) 60%, rgba(10, 15, 30, 0.45) 100%);
         }
 
-        /* ==================== ⚡ 智能拟物交互响应 ==================== */
-        
-        /* 悬停（Hover）：阻尼弹起、阴影双层扩散、折射高光微调 */
+        /* ==================== ⚡ 智能交互响应 ==================== */
         .ling-pet-compass:hover { 
             transform: scale(1.1) cubic-bezier(0.34, 1.56, 0.64, 1) !important; 
             --glass-umbra-y: 8px !important;
@@ -192,7 +192,6 @@
             --glass-penumbra-blur: 40px !important;
             --glass-shadow-opacity: 0.22 !important;
             --glass-rim-glow: rgba(255, 255, 255, 0.95);
-            /* 折射光斑随视角反向微移，产生凸透镜视差 */
             --glass-specular-move: translate(-2px, -1px) scale(1.05);
         }
         
@@ -200,13 +199,11 @@
             transform: scale(1.06);
         }
 
-        /* 四象悬停边框色彩共振 */
         .ling-pet-compass[data-state="day"]:hover    { border-color: rgba(59, 130, 246, 0.85); }
         .ling-pet-compass[data-state="night"]:hover  { border-color: rgba(56, 189, 248, 0.85); } 
         .ling-pet-compass[data-state="sunset"]:hover { border-color: rgba(249, 115, 22, 0.85); }
         .ling-pet-compass[data-state="sky"]:hover    { border-color: rgba(34, 211, 238, 0.85); }
 
-        /* 点击/拖拽（Active）：向内机械沉降 */
         .ling-pet-compass:active { 
             transform: scale(0.93) !important; 
             --glass-umbra-y: 2px !important;
@@ -227,16 +224,14 @@
                 box-shadow: 0 0 0 0px var(--glass-border-color), 0px var(--glass-penumbra-y) var(--glass-penumbra-blur) rgba(0, 0, 0, var(--glass-shadow-opacity));
                 backdrop-filter: blur(8px) saturate(120%);
             }
-            40% {
-                backdrop-filter: blur(18px) saturate(180%);
-            }
+            40% { backdrop-filter: blur(18px) saturate(180%); }
             100% { 
                 box-shadow: 0 0 0 16px rgba(255,255,255,0), 0px var(--glass-penumbra-y) var(--glass-penumbra-blur) rgba(0, 0, 0, var(--glass-shadow-opacity));
                 backdrop-filter: blur(14px) saturate(155%);
             }
         }
 
-        /* 内部极光舒张动态 */
+        /* 内部极光舒张 */
         @keyframes glassAuroraBreathe {
             0% { transform: scale(1) translate(0px, 0px) rotate(0deg); filter: brightness(0.98); }
             50% { transform: scale(1.08) translate(2px, -1px) rotate(1.5deg); filter: brightness(1.06); }
@@ -253,20 +248,16 @@
     styleNode.textContent = STYLES;
     document.head.appendChild(styleNode);
 
-    // ================= 2. 铸造全新 DOM 架构 =================
+    // ================= 2. 铸造 DOM 架构 =================
     const dot = document.createElement('div');
     dot.className = 'ling-pet-compass';
-    dot.setAttribute('role', 'button');
-    dot.setAttribute('aria-live', 'polite');
     dot.setAttribute('data-state', 'day'); 
     dot.setAttribute('data-system-drag', '1'); 
 
-    // 晶莹极光内心
     const auroraCore = document.createElement('div');
     auroraCore.className = 'ling-pet-compass__aurora-core';
     dot.appendChild(auroraCore);
 
-    // 文字层
     const textLayer = document.createElement('div');
     textLayer.className = 'ling-pet-compass__text';
     textLayer.textContent = '---';
@@ -316,11 +307,17 @@
         window.dotTimer = setTimeout(updateDotStyle, 100);
     });
     const targetNode = document.getElementById('headerGameTime');
-    if (targetNode) observer.observe(targetNode, { childList: true, characterData: true, subtree: true, attributes: true });
+    if (targetNode) observer.observe(targetNode, { childList: true, characterData: true, subtree: true });
 
-    // ================= 4. 物理拖拽与智能阻尼边界吸附 =================
+    // ================= 4. 物理拖拽、智能吸附、双击障眼法 =================
     let isDragging = false;
     let offsetX, offsetY;
+
+    // ✨ 核心增改：双击触发/解除障眼法匿迹状态
+    dot.addEventListener('dblclick', (e) => {
+        e.stopPropagation(); // 阻止事件冒泡
+        dot.classList.toggle('ling-anqi-hidden');
+    });
 
     function snapToEdges(currentLeft, currentTop) {
         const dotWidth = dot.offsetWidth;
@@ -349,8 +346,7 @@
         finalLeft = Math.max(0, Math.min(winWidth - dotWidth, finalLeft));
         finalTop = Math.max(0, Math.min(winHeight - dotHeight, finalTop));
 
-        // 吸附回弹：享受丝滑贝塞尔
-        dot.style.transition = 'box-shadow 0.25s ease, transform 0.3s ease, left 0.48s cubic-bezier(0.25, 1, 0.5, 1), top 0.48s cubic-bezier(0.25, 1, 0.5, 1)';
+        dot.style.transition = 'box-shadow 0.25s ease, transform 0.3s ease, opacity 0.4s ease, left 0.48s cubic-bezier(0.25, 1, 0.5, 1), top 0.48s cubic-bezier(0.25, 1, 0.5, 1)';
         dot.offsetHeight; 
 
         dot.style.left = finalLeft + 'px';
@@ -392,7 +388,7 @@
         snapToEdges(parseFloat(dot.style.left), parseFloat(dot.style.top));
     };
 
-    dot.addEventListener('mousedown', (e) => startDrag(e.clientX, e.clientY));
+    dot.addEventListener('mousedown', (e) => { if(e.button === 0) startDrag(e.clientX, e.clientY); });
     document.addEventListener('mousemove', (e) => moveDrag(e.clientX, e.clientY));
     document.addEventListener('mouseup', endDrag);
 
