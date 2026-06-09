@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         灵界时辰天道罗盘
 // @namespace    http://tampermonkey.net/
-// @version      20.8.6
-// @description  拟物交互视觉流体玉莹无瑕版。优化吸附重绘帧、收敛玄青夜色边缘毛边、赋予静止期灵液微流呼吸感。
+// @version      20.8.7
+// @description  拟物交互视觉流体玉莹无界版。彻底去除灵珠内部生硬的次级小圈边界与暗纹，使四象流体彻底融汇，真言透视更显空灵。
 // @author       修仙道友
 // @match        https://ling.muge.info/game.html
 // @match        http://ling.muge.info/game.html
@@ -49,7 +49,7 @@
             --ling-jade-bg-color: #f4f3f0;
             --ling-jade-glint: rgba(255, 255, 255, 0.7);
             --ling-stream-bg: linear-gradient(90deg, #eae8e3, #fcfbf9, #cbd5e1, #eae8e3);
-            --ling-blend-mode: screen; /* 动态混合模式定义 */
+            --ling-blend-mode: screen; 
             
             /* 四象流体灵液核心色轨配置 */
             --fluid-prime-color: radial-gradient(circle at 30% 30%, rgba(147,197,253,0.8) 0%, transparent 65%);
@@ -80,12 +80,11 @@
             transform: scale(1);
             animation: lingStreamMove 16s linear infinite;
             
-            /* 动效增强：平滑非线性吸附与缓动 */
             transition: box-shadow 0.35s cubic-bezier(0.25, 1, 0.5, 1),
                         transform 0.4s cubic-bezier(0.25, 1, 0.36, 1);
         }
 
-        /* __aura 护体灵气环层（静止时赋予 0.15 的微弱呼吸感） */
+        /* __aura 护体灵气环层 */
         .ling-pet-compass__aura {
             position: absolute; top: -5px; left: -5px; right: -5px; bottom: -5px; border-radius: 50%;
             background: var(--ling-stream-bg); background-size: 300% 100%;
@@ -94,19 +93,15 @@
             transition: opacity 0.45s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
-        /* 2. __core 灵玉核心层 */
+        /* 2. __core 灵玉核心层（重铸：去除次级小圈阴影与网格暗纹，全面莹澈化） */
         .ling-pet-compass__core {
             position: absolute; top: 6px; left: 6px; right: 6px; bottom: 6px;
             border-radius: 50%; z-index: 5; box-sizing: border-box; overflow: hidden;
             background-color: var(--ling-jade-bg-color);
-            background-image: 
-                linear-gradient(45deg, rgba(255,255,255,0.05) 25%, transparent 25%), 
-                linear-gradient(-45deg, rgba(255,255,255,0.05) 25%, transparent 25%);
-            background-size: 6px 6px; 
+            /* 抹除原有小圈边界线与背景粒子，使流体无界融合 */
             box-shadow: 
                 inset 1.5px 1.5px 3px var(--ling-jade-glint), 
-                inset -1.5px -1.5px 3px rgba(0, 0, 0, 0.3),   
-                inset 0 0 0 1px var(--ling-inset-border-color); 
+                inset -1.5px -1.5px 3px rgba(0, 0, 0, 0.3); 
             transition: background-color 1.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
@@ -169,13 +164,13 @@
         }
         .ling-pet-compass[data-state="day"] .ling-pet-compass__text { color: #232a30; text-shadow: 0px 1px 2px rgba(0,0,0,0.18), 0.5px 0.5px 0.5px rgba(255,255,255,0.9); }
 
-        /* [夜间：优化收敛边缘截断点，并调整混合模式为 overlay，去除灰边] */
+        /* [夜间：寒潭玄青与幽冥墨蓝] */
         .ling-pet-compass[data-state="night"] { 
             --ling-inset-border-color: rgba(56, 189, 248, 0.22); 
             --ling-jade-bg-color: #0b0f17;                       
             --ling-jade-glint: rgba(255, 255, 255, 0.08); 
             --ling-stream-bg: linear-gradient(90deg, #090d14, #0f172a, #1e293b, #090d14); 
-            --ling-blend-mode: overlay; /* 幽暗底色下采用叠加模式使光影融合更自然 */
+            --ling-blend-mode: overlay; 
             --fluid-prime-color: radial-gradient(circle at var(--ling-light-x) var(--ling-light-y), rgba(56, 189, 248, 0.85) 0%, rgba(30, 41, 59, 0.6) 35%, transparent 60%);
             --fluid-sub-color: radial-gradient(circle at 40% 70%, rgba(15, 23, 42, 0.95) 0%, transparent 55%);
         }
@@ -257,7 +252,7 @@
         @media screen and (max-width: 768px) {
             .ling-pet-compass { width: 40px; height: 40px; }
             .ling-pet-compass__text { font-size: 12px; line-height: 28px; }
-            .ling-pet-compass__core { top: 5.5px; left: 5.5px; right: 5.5px; bottom: 5.5px; }
+            .ling-pet-compass { top: 85px; right: 20px; }
         }
     `;
 
@@ -427,10 +422,7 @@
         finalLeft = Math.max(0, Math.min(winWidth - dotWidth, finalLeft));
         finalTop = Math.max(0, Math.min(winHeight - dotHeight, finalTop));
 
-        // 飞升优化：将 transition 移入吸附内部，确保仅在松开瞬间产生连贯吸附，拒绝帧抖动
         dot.style.transition = 'box-shadow 0.25s cubic-bezier(0.25, 1, 0.5, 1), transform 0.3s ease, left 0.4s cubic-bezier(0.25, 1, 0.5, 1), top 0.4s cubic-bezier(0.25, 1, 0.5, 1)';
-        
-        // 强制触发重绘，防止浏览器合并过渡帧
         dot.offsetHeight; 
 
         dot.style.left = finalLeft + 'px';
@@ -455,7 +447,7 @@
         isDragging = true;
         offsetX = clientX - dot.getBoundingClientRect().left;
         offsetY = clientY - dot.getBoundingClientRect().top;
-        dot.style.transition = 'none'; // 拖拽中完全由硬件接管
+        dot.style.transition = 'none'; 
     };
 
     const moveDrag = (clientX, clientY) => {
